@@ -1,13 +1,10 @@
 import React from 'react';
 import RestartButton from './RestartButton';
 import { useGameLogic } from '@/hooks/useGameLogic';
+import { GameState } from '@/utils/gameLogic';
 
 interface GameStatusProps {
-  gameState: {
-    winner: string | null;
-    board: string[];
-    currentPlayer: string;
-  };
+  gameState: GameState;
   onRestart: () => void;
 }
 

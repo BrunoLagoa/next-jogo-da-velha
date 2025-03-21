@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Board from '@/components/Board';
 import { initialGameState, makeMove, GameState } from '@/utils/gameLogic';
 import GameStatus from '@/components/GameStatus';
+import GameHistory from '@/components/GameHistory';
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
@@ -18,6 +19,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Jogo da Velha</h1>
         <Board gameState={gameState} onCellClick={handleCellClick} />
         <GameStatus gameState={gameState} onRestart={() => setGameState(initialGameState)} />
+        <GameHistory history={gameState.history} />
       </main>
     </div>
   );

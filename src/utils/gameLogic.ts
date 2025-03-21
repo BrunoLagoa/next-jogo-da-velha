@@ -2,12 +2,14 @@ export interface GameState {
   board: string[];
   currentPlayer: string;
   winner: string | null;
+  history: { player: string; position: number }[];
 }
 
 export const initialGameState: GameState = {
   board: Array(9).fill(''),
   currentPlayer: 'X',
-  winner: null
+  winner: null,
+  history: []
 };
 
 export const checkWinner = (board: string[]): string | null => {
@@ -44,6 +46,7 @@ export const makeMove = (state: GameState, index: number): GameState => {
   return {
     board: newBoard,
     currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
-    winner
+    winner,
+    history: [...state.history, { player: state.currentPlayer, position: index }]
   };
 };
