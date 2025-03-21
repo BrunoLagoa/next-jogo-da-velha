@@ -3,13 +3,17 @@ export interface GameState {
   currentPlayer: string;
   winner: string | null;
   history: { player: string; position: number }[];
+  playerXName: string;
+  playerOName: string;
 }
 
 export const initialGameState: GameState = {
   board: Array(9).fill(''),
   currentPlayer: 'X',
   winner: null,
-  history: []
+  history: [],
+  playerXName: '',
+  playerOName: ''
 };
 
 export const checkWinner = (board: string[]): string | null => {
@@ -44,6 +48,7 @@ export const makeMove = (state: GameState, index: number): GameState => {
   const winner = checkWinner(newBoard);
 
   return {
+    ...state,
     board: newBoard,
     currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
     winner,
