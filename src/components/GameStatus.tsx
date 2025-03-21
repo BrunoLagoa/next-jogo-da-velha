@@ -1,22 +1,25 @@
 import React from 'react';
 import RestartButton from './RestartButton';
+import { useGameLogic } from '@/hooks/useGameLogic';
 
 interface GameStatusProps {
   gameState: {
     winner: string | null;
     board: string[];
+    currentPlayer: string;
   };
   onRestart: () => void;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
-  const isDraw = !gameState.winner && gameState.board.every(cell => cell !== '');
+  const { getGameStatus } = useGameLogic();
+  const { winner, isDraw } = getGameStatus(gameState);
 
   return (
     <div className="flex flex-col items-center gap-4 w-full text-center">
-      {gameState.winner && (
+      {winner && (
         <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          Vencedor: <span className="text-white">{gameState.winner}</span>
+          Vencedor: <span className="text-white">{winner}</span>
         </div>
       )}
       {isDraw && (
