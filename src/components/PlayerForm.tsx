@@ -1,8 +1,5 @@
 import { useState } from 'react';
-
-export interface PlayerFormProps {
-  onStart: (playerX: string, playerO: string) => void;
-}
+import { PlayerFormProps } from '../types/playerFormTypes';
 
 export default function PlayerForm({ onStart }: PlayerFormProps) {
   const [playerX, setPlayerX] = useState('');
