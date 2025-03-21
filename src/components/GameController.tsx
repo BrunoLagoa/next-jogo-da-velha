@@ -1,3 +1,5 @@
+"use client";
+
 import { useGameController } from '@/hooks/useGameController';
 import Board from '@/components/Board';
 import GameStatus from '@/components/GameStatus';
