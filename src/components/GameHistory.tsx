@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameHistoryProps } from '../types/game';
+import { GameHistoryProps } from '../types/gameHistoryTypes';
 
 const GameHistory: React.FC<GameHistoryProps> = ({ history }) => {
   return (
