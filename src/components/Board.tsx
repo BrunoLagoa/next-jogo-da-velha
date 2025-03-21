@@ -1,10 +1,5 @@
 import React from 'react';
-import { GameState } from '@/utils/gameLogic';
-
-interface BoardProps {
-  gameState: GameState;
-  onCellClick: (index: number) => void;
-}
+import { BoardProps } from '@/types/boardTypes';
 
 const Board: React.FC<BoardProps> = ({ gameState, onCellClick }) => {
   return (

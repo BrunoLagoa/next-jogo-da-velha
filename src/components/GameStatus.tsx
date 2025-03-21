@@ -1,12 +1,7 @@
 import React from 'react';
 import RestartButton from './RestartButton';
 import { useGameLogic } from '@/hooks/useGameLogic';
-import { GameState } from '@/utils/gameLogic';
-
-interface GameStatusProps {
-  gameState: GameState;
-  onRestart: () => void;
-}
+import { GameStatusProps } from '@/types/gameStatusTypes';
 
 const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
   const { getGameStatus } = useGameLogic();
