@@ -1,4 +1,5 @@
 import React from 'react';
+import RestartButton from './RestartButton';
 
 interface GameStatusProps {
   gameState: {
@@ -24,12 +25,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
         </div>
       )}
       {(gameState.winner || isDraw) && (
-        <button
-          className="mt-4 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
-          onClick={onRestart}
-        >
-          Reiniciar Jogo
-        </button>
+        <RestartButton onRestart={onRestart} />
       )}
     </div>
   );
