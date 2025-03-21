@@ -1,13 +1,5 @@
 import React from 'react';
-
-interface Move {
-  player: string;
-  position: number;
-}
-
-interface GameHistoryProps {
-  history: Move[];
-}
+import { GameHistoryProps } from '../types/game';
 
 const GameHistory: React.FC<GameHistoryProps> = ({ history }) => {
   return (
