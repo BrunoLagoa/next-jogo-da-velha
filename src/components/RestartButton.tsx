@@ -1,8 +1,5 @@
+import { RestartButtonProps } from '@/types/restartButtonTypes';
 import React from 'react';
-
-interface RestartButtonProps {
-  onRestart: () => void;
-}
 
 const RestartButton: React.FC<RestartButtonProps> = ({ onRestart }) => {
   return (
