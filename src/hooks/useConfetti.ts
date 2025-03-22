@@ -1,12 +1,13 @@
 import { CONFETTI_DURATION_MS } from '@/config/confettiConfig';
 import { useEffect, useState } from 'react';
 
-export const useConfetti = (winner: string | null) => {
+export const useConfetti = (winner: string | null | boolean) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [opacity, setOpacity] = useState(1);
 
   useEffect(() => {
-    if (winner) {
+    setShowConfetti(false);
+    if (winner || winner === false) {
       setShowConfetti(true);
       setOpacity(1);
       const interval = setInterval(() => {
