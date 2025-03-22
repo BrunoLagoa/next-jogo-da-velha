@@ -5,7 +5,7 @@ import { useConfetti } from '@/hooks/useConfetti';
 import { getConfettiConfig } from '@/config/confettiConfig';
 
 const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ winner }) => {
-  const showConfetti = useConfetti(winner);
+  const { showConfetti, opacity } = useConfetti(winner);
 
   return (
     showConfetti && (
@@ -14,6 +14,7 @@ const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ winner }) => {
         height={getConfettiConfig().HEIGHT}
         recycle={getConfettiConfig().RECYCLE}
         numberOfPieces={getConfettiConfig().NUMBER_OF_PIECES}
+        opacity={opacity}
       />
     )
   );
