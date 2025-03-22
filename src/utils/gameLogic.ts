@@ -1,13 +1,4 @@
-export interface GameState {
-  board: string[];
-  currentPlayer: string;
-  winner: string | null;
-  history: { player: string; position: number; winner: string | null }[];
-  playerXName: string;
-  playerOName: string;
-  playerXScore: number;
-  playerOScore: number;
-}
+import { GameState } from '../types/gameStateTypes';
 
 export const initialGameState: GameState = {
   board: Array(9).fill(''),
