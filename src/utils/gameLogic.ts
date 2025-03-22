@@ -9,16 +9,16 @@ export type GameState = {
   history: { player: string; position: number; winner: string | null }[];
 };
 
-export const initialGameState: GameState = {
+export const getInitialGameState = (currentState: GameState): GameState => ({
   board: Array(9).fill(''),
   currentPlayer: 'X',
   winner: null,
   history: [],
-  playerXName: '',
-  playerOName: '',
-  playerXScore: 0,
-  playerOScore: 0
-};
+  playerXName: currentState.playerXName,
+  playerOName: currentState.playerOName,
+  playerXScore: currentState.playerXScore,
+  playerOScore: currentState.playerOScore
+});
 
 export const checkWinner = (board: string[]): string | null => {
   const winningCombinations = [

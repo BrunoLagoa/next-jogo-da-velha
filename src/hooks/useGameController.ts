@@ -1,10 +1,19 @@
 "use client"
 
 import { useState } from 'react';
-import { initialGameState, makeMove, GameState } from '@/utils/gameLogic';
+import { getInitialGameState, makeMove, GameState } from '@/utils/gameLogic';
 
 export const useGameController = () => {
-  const [gameState, setGameState] = useState<GameState>(initialGameState);
+  const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
+    board: Array(9).fill(''), 
+    history: [], 
+    playerXName: '', 
+    playerOName: '', 
+    playerXScore: 0, 
+    playerOScore: 0,
+    currentPlayer: 'X',
+    winner: null
+  }));
 
   const handleStart = (playerX: string, playerO: string) => {
     setGameState((prev: GameState) => ({ 
@@ -20,7 +29,16 @@ export const useGameController = () => {
 
   const handleRestart = () => {
     setGameState((prevState: GameState) => ({ 
-      ...initialGameState,
+      ...getInitialGameState({ 
+        board: Array(9).fill(''), 
+        history: [], 
+        playerXName: '', 
+        playerOName: '', 
+        playerXScore: 0, 
+        playerOScore: 0,
+        currentPlayer: 'X',
+        winner: null
+      }),
       playerXName: prevState.playerXName,
       playerOName: prevState.playerOName,
       playerXScore: prevState.playerXScore,
@@ -30,11 +48,22 @@ export const useGameController = () => {
 
   const handleContinue = () => {
     setGameState((prevState: GameState) => ({ 
-      ...initialGameState,
+      ...getInitialGameState({ 
+        board: Array(9).fill(''), 
+        history: [], 
+        playerXName: '', 
+        playerOName: '', 
+        playerXScore: 0, 
+        playerOScore: 0,
+        currentPlayer: 'X',
+        winner: null
+      }),
       playerXName: prevState.playerXName,
       playerOName: prevState.playerOName,
       playerXScore: prevState.playerXScore,
-      playerOScore: prevState.playerOScore
+      playerOScore: prevState.playerOScore,
+      board: Array(9).fill(''),
+      history: []
     }));
   };
 
