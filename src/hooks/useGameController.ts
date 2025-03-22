@@ -7,7 +7,7 @@ export const useGameController = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
 
   const handleStart = (playerX: string, playerO: string) => {
-    setGameState(prev => ({
+    setGameState((prev: GameState) => ({ 
       ...prev,
       playerXName: playerX,
       playerOName: playerO
@@ -15,11 +15,21 @@ export const useGameController = () => {
   };
 
   const handleCellClick = (index: number) => {
-    setGameState(prevState => makeMove(prevState, index));
+    setGameState((prevState: GameState) => makeMove(prevState, index));
   };
 
   const handleRestart = () => {
-    setGameState(prevState => ({
+    setGameState((prevState: GameState) => ({ 
+      ...initialGameState,
+      playerXName: prevState.playerXName,
+      playerOName: prevState.playerOName,
+      playerXScore: prevState.playerXScore,
+      playerOScore: prevState.playerOScore
+    }));
+  };
+
+  const handleContinue = () => {
+    setGameState((prevState: GameState) => ({ 
       ...initialGameState,
       playerXName: prevState.playerXName,
       playerOName: prevState.playerOName,
@@ -32,6 +42,7 @@ export const useGameController = () => {
     gameState,
     handleStart,
     handleCellClick,
-    handleRestart
+    handleRestart,
+    handleContinue
   };
 };

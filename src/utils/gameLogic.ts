@@ -1,4 +1,13 @@
-import { GameState } from '../types/gameStateTypes';
+export type GameState = {
+  board: string[];
+  currentPlayer: string;
+  playerXName: string;
+  playerOName: string;
+  playerXScore: number;
+  playerOScore: number;
+  winner: string | null;
+  history: { player: string; position: number; winner: string | null }[];
+};
 
 export const initialGameState: GameState = {
   board: Array(9).fill(''),
@@ -33,7 +42,7 @@ export const checkWinner = (board: string[]): string | null => {
 };
 
 export const makeMove = (state: GameState, index: number): GameState => {
-  if (state.board[index] !== '' || state.winner) {
+  if (state.board[index] !== '') {
     return state;
   }
 
