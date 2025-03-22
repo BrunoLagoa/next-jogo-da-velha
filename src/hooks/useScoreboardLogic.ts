@@ -5,13 +5,11 @@ export const useScoreboardLogic = (gameState: GameState) => {
     let xWins = 0;
     let oWins = 0;
 
-    gameState.history.forEach((move, index, array) => {
-      if (index > 0 && array[index - 1].player === move.player) {
-        if (move.player === 'X') {
-          xWins++;
-        } else {
-          oWins++;
-        }
+    gameState.history.forEach((move) => {
+      if (move.winner === 'X') {
+        xWins++;
+      } else if (move.winner === 'O') {
+        oWins++;
       }
     });
 

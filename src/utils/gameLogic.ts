@@ -2,7 +2,7 @@ export interface GameState {
   board: string[];
   currentPlayer: string;
   winner: string | null;
-  history: { player: string; position: number }[];
+  history: { player: string; position: number; winner: string | null }[];
   playerXName: string;
   playerOName: string;
 }
@@ -52,6 +52,6 @@ export const makeMove = (state: GameState, index: number): GameState => {
     board: newBoard,
     currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
     winner,
-    history: [...state.history, { player: state.currentPlayer, position: index }]
+    history: [...state.history, { player: state.currentPlayer, position: index, winner: winner }]
   };
 };
