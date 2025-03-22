@@ -3,6 +3,7 @@ import ConfettiAnimation from './ConfettiAnimation';
 import RestartButton from './RestartButton';
 import { useGameLogic } from '@/hooks/useGameLogic';
 import { GameStatusProps } from '@/types/gameStatusTypes';
+import ContinueButton from './ContinueButton';
 
 const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
   const { getGameStatus } = useGameLogic();
@@ -29,7 +30,10 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
         </div>
       )}
       {(gameState.winner || isDraw) && (
-        <RestartButton onRestart={onRestart} />
+        <div className="flex gap-4">
+          <ContinueButton onClick={onRestart} />
+          <RestartButton onRestart={onRestart} />
+        </div>
       )}
       <ConfettiAnimation winner={gameState.winner} />
     </div>

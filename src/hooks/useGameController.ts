@@ -19,11 +19,13 @@ export const useGameController = () => {
   };
 
   const handleRestart = () => {
-    setGameState({
+    setGameState(prevState => ({
       ...initialGameState,
-      playerXName: gameState.playerXName,
-      playerOName: gameState.playerOName
-    });
+      playerXName: prevState.playerXName,
+      playerOName: prevState.playerOName,
+      playerXScore: prevState.playerXScore,
+      playerOScore: prevState.playerOScore
+    }));
   };
 
   return {

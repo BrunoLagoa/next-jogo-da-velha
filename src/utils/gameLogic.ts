@@ -5,6 +5,8 @@ export interface GameState {
   history: { player: string; position: number; winner: string | null }[];
   playerXName: string;
   playerOName: string;
+  playerXScore: number;
+  playerOScore: number;
 }
 
 export const initialGameState: GameState = {
@@ -13,7 +15,9 @@ export const initialGameState: GameState = {
   winner: null,
   history: [],
   playerXName: '',
-  playerOName: ''
+  playerOName: '',
+  playerXScore: 0,
+  playerOScore: 0
 };
 
 export const checkWinner = (board: string[]): string | null => {
