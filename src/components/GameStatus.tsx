@@ -1,4 +1,5 @@
 import React from 'react';
+import ConfettiAnimation from './ConfettiAnimation';
 import RestartButton from './RestartButton';
 import { useGameLogic } from '@/hooks/useGameLogic';
 import { GameStatusProps } from '@/types/gameStatusTypes';
@@ -30,6 +31,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
       {(gameState.winner || isDraw) && (
         <RestartButton onRestart={onRestart} />
       )}
+      <ConfettiAnimation winner={gameState.winner} />
     </div>
   );
 };
