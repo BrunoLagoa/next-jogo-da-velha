@@ -32,17 +32,13 @@ export const useGameController = () => {
       ...getInitialGameState({ 
         board: Array(9).fill(''), 
         history: [], 
-        playerXName: '', 
-        playerOName: '', 
+        playerXName: prevState.playerXName, 
+        playerOName: prevState.playerOName, 
         playerXScore: 0, 
         playerOScore: 0,
         currentPlayer: 'X',
         winner: null
-      }),
-      playerXName: prevState.playerXName,
-      playerOName: prevState.playerOName,
-      playerXScore: prevState.playerXScore,
-      playerOScore: prevState.playerOScore
+      })
     }));
   };
 
