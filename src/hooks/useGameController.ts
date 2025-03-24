@@ -47,12 +47,10 @@ export const useGameController = () => {
   };
 
   const handleContinue = () => {
-    setGameState((prevState: GameState) => ({ 
-      ...prevState,
-      board: Array(9).fill(''),
-      history: [],
-      currentPlayer: 'X',
-      winner: null,
+    setGameState((prevState: GameState) => ({
+      ...getInitialGameState(prevState),
+      playerXName: prevState.playerXName,
+      playerOName: prevState.playerOName,
       playerXScore: prevState.playerXScore,
       playerOScore: prevState.playerOScore
     }));

@@ -52,11 +52,22 @@ export const makeMove = (state: GameState, index: number): GameState => {
   const winner = checkWinner(newBoard);
   const isDraw = !winner && newBoard.every(cell => cell !== '');
 
+  let playerXScore = state.playerXScore;
+  let playerOScore = state.playerOScore;
+
+  if (winner === 'X') {
+    playerXScore += 1;
+  } else if (winner === 'O') {
+    playerOScore += 1;
+  }
+
   return {
     ...state,
     board: newBoard,
     currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
     winner: isDraw ? null : winner,
+    playerXScore,
+    playerOScore,
     history: [...state.history, { player: state.currentPlayer, position: index, winner: isDraw ? null : winner }]
   };
 };
