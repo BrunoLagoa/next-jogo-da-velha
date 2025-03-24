@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GameHistoryProps } from '../types/gameHistoryTypes';
+import HistoryItem from './HistoryItem';
 
 const GameHistory: React.FC<GameHistoryProps> = ({ history }) => {
+  const reversedHistory = useMemo(() => [...history].reverse(), [history]);
+
+  if (!history.length) return null;
+
   return (
-    <div className="mt-8">
-      {!!history.length && (
-        <h2 className="text-xl font-bold mb-4">Histórico de Jogadas</h2>
-      )}
-      <ul className="list-disc list-inside">
-        {history.slice().reverse().map((move, index) => (
-          <li key={index} className="text-gray-300">
-            Jogada {index + 1}: {move.player} na posição {move.position}
-          </li>
+    <div className="mt-8" role="region" aria-label="Histórico de Jogadas">
+      <h2 className="text-xl font-bold mb-4">Histórico de Jogadas</h2>
+      <ul className="list-disc list-inside" role="list">
+        {reversedHistory.map((move, index) => (
+          <HistoryItem
+            key={history.length - index}
+            move={move}
+            moveNumber={history.length - index}
+          />
         ))}
       </ul>
     </div>
