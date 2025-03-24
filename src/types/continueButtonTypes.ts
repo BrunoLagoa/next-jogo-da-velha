@@ -1,3 +1,3 @@
 export interface ContinueButtonProps {
-  onClick: () => void;
+  onContinue: () => void;
 }

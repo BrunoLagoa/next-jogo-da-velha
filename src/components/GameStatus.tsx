@@ -5,7 +5,7 @@ import { useGameLogic } from '@/hooks/useGameLogic';
 import { GameStatusProps } from '@/types/gameStatusTypes';
 import ContinueButton from './ContinueButton';
 
-const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
+const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart, onContinue }) => {
   const { getGameStatus } = useGameLogic();
   const { winner, isDraw } = getGameStatus(gameState);
   const currentPlayer = gameState.currentPlayer === 'X' 
@@ -31,7 +31,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart }) => {
       )}
       {(gameState.winner || isDraw) && (
         <div className="flex gap-4">
-          <ContinueButton onClick={onRestart} />
+          <ContinueButton onContinue={onContinue} />
           <RestartButton onRestart={onRestart} />
         </div>
       )}
