@@ -12,8 +12,6 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart, onContinu
     ? gameState.playerXName 
     : gameState.playerOName;
 
-  console.log(isDraw, winner)
-
   return (
     <div className="flex flex-col items-center gap-4 w-full text-center">
       {winner && (

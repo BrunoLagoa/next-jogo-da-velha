@@ -1,3 +1,5 @@
+import { GAME_CONFIG } from '@/config/gameConfig';
+
 export type GameState = {
   board: string[];
   currentPlayer: string;
@@ -10,8 +12,8 @@ export type GameState = {
 };
 
 export const getInitialGameState = (currentState: GameState): GameState => ({
-  board: Array(9).fill(''),
-  currentPlayer: 'X',
+  board: Array(GAME_CONFIG.BOARD_SIZE).fill(''),
+  currentPlayer: GAME_CONFIG.PLAYERS.X.SYMBOL,
   winner: null,
   history: [],
   playerXName: currentState.playerXName,
@@ -21,18 +23,8 @@ export const getInitialGameState = (currentState: GameState): GameState => ({
 });
 
 export const checkWinner = (board: string[]): string | null => {
-  const winningCombinations = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ];
 
-  for (const combination of winningCombinations) {
+  for (const combination of GAME_CONFIG.WINNING_COMBINATIONS) {
     const [a, b, c] = combination;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
       return board[a];
@@ -64,7 +56,7 @@ export const makeMove = (state: GameState, index: number): GameState => {
   return {
     ...state,
     board: newBoard,
-    currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
+    currentPlayer: state.currentPlayer === GAME_CONFIG.PLAYERS.X.SYMBOL ? GAME_CONFIG.PLAYERS.O.SYMBOL : GAME_CONFIG.PLAYERS.X.SYMBOL,
     winner: isDraw ? null : winner,
     playerXScore,
     playerOScore,
