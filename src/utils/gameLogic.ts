@@ -50,8 +50,6 @@ export const makeMove = (state: GameState, index: number): GameState => {
   newBoard[index] = state.currentPlayer;
 
   const winner = checkWinner(newBoard);
-  const isDraw = !winner && newBoard.every(cell => cell !== '');
-
   let playerXScore = state.playerXScore;
   let playerOScore = state.playerOScore;
 
@@ -60,6 +58,8 @@ export const makeMove = (state: GameState, index: number): GameState => {
   } else if (winner === 'O') {
     playerOScore += 1;
   }
+
+  const isDraw = !winner && newBoard.every(cell => cell !== '');
 
   return {
     ...state,

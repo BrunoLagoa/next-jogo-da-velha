@@ -29,7 +29,7 @@ export const useGameLogic = () => {
 
   const getGameStatus = useCallback((state: GameState) => {
     const winner = checkWinner(state.board);
-    const isDraw = checkDraw(state.board);
+    const isDraw = !winner && checkDraw(state.board);
 
     return {
       winner,
