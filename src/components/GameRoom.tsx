@@ -18,10 +18,10 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
   const { gameState, handleStart, handleCellClick, handleRestart, handleContinue } = useGameController();
 
   useEffect(() => {
-    if (room.playerX && room.playerO) {
+    if (room.playerX && room.playerO && room.status === 'playing' && !gameState.playerXName) {
       handleStart(room.playerX, room.playerO);
     }
-  }, [room.playerX, room.playerO, handleStart]);
+  }, [room.playerX, room.playerO, room.status, gameState.playerXName, handleStart]);
 
   const handleLeave = () => {
     onLeaveRoom(room.id, playerName);
