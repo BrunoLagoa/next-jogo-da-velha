@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoomController } from '@/hooks/useRoomController';
 import Lobby from '@/components/Lobby';
 import GameRoom from '@/components/GameRoom';
 
-export default function GameController() {
+interface GameControllerProps {
+  initialRoomId?: string;
+}
+
+export default function GameController({ initialRoomId }: GameControllerProps) {
   const [playerName, setPlayerName] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const { rooms, createRoom, joinRoom, leaveRoom } = useRoomController();
 
-  const handleCreateRoom = (name: string) => {
-    if (!playerName) return;
-    const room = createRoom(name);
-    joinRoom(room.id, playerName);
-    setSelectedRoomId(room.id);
+  const handleCreateRoom = async (name: string) => {
+    if (!playerName || !name.trim()) return;
+    try {
+      const newRoom = await createRoom(name, playerName);
+      setSelectedRoomId(newRoom.id);
+    } catch (error) {
+      console.error('Erro ao criar sala:', error);
+    }
   };
 
   const handleJoinRoom = (roomId: string) => {
@@ -34,8 +41,24 @@ export default function GameController() {
     e.preventDefault();
     if (playerName.trim()) {
       setIsNameSubmitted(true);
+      if (initialRoomId) {
+        const room = rooms.find(r => r.id === initialRoomId);
+        if (room && (room.playerX === null || room.playerO === null)) {
+          handleJoinRoom(initialRoomId);
+        }
+      }
     }
   };
+
+  useEffect(() => {
+    if (isNameSubmitted && initialRoomId) {
+      const room = rooms.find(r => r.id === initialRoomId);
+      if (room && (room.playerX === null || room.playerO === null)) {
+        handleJoinRoom(initialRoomId);
+      }
+    }
+  }, [isNameSubmitted, initialRoomId, rooms]);
+
 
   if (!isNameSubmitted) {
     return (
