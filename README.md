@@ -7,10 +7,11 @@ Este é um projeto de Jogo da Velha desenvolvido com Next.js, criado usando [`cr
 - [Next.js](https://nextjs.org)
 - [React](https://reactjs.org)
 - [TypeScript](https://www.typescriptlang.org)
+- WebSocket - Para comunicação em tempo real entre jogadores
 
 ## Como Executar o Projeto
 
-Primeiro, instale as dependências:
+1. Primeiro, instale as dependências:
 
 ```bash
 npm install
@@ -22,7 +23,19 @@ pnpm install
 bun install
 ```
 
-Em seguida, inicie o servidor de desenvolvimento:
+2. Certifique-se de estar usando a versão correta do Node.js:
+
+```bash
+nvm use
+```
+
+3. Em um terminal, inicie o servidor WebSocket:
+
+```bash
+npx ts-node --esm src/server/websocket.ts
+```
+
+4. Em outro terminal, inicie o servidor de desenvolvimento Next.js:
 
 ```bash
 npm run dev
@@ -34,7 +47,9 @@ pnpm dev
 bun dev
 ```
 
-Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
+5. Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
+
+**Importante**: O servidor WebSocket deve estar rodando para que o jogo multiplayer funcione corretamente. Se você encontrar algum erro ao iniciar o servidor WebSocket, certifique-se de que está usando a versão correta do Node.js conforme especificado no arquivo `.nvmrc`.
 
 ## Estrutura do Projeto
 
