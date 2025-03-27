@@ -27,8 +27,10 @@ export const useGameController = () => {
 
   const handleStart = (playerX: string, playerO: string) => {
     const playerName = localStorage.getItem('playerName');
-    if (!playerName || (playerName !== playerX && playerName !== playerO)) {
+    if (!playerName) {
       localStorage.setItem('playerName', playerX);
+    } else if (playerName !== playerX && playerName !== playerO) {
+      localStorage.setItem('playerName', playerO);
     }
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
@@ -71,7 +73,8 @@ export const useGameController = () => {
     if (playerName !== currentPlayerName) {
       console.log('Não é sua vez:', {
         playerName,
-        currentPlayerName
+        currentPlayerName,
+        currentPlayer: gameState.currentPlayer
       });
       return;
     }
