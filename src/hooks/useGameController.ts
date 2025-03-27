@@ -27,10 +27,8 @@ export const useGameController = () => {
 
   const handleStart = (playerX: string, playerO: string) => {
     const playerName = localStorage.getItem('playerName');
-    if (!playerName) {
+    if (!playerName || (playerName !== playerX && playerName !== playerO)) {
       localStorage.setItem('playerName', playerX);
-    } else if (playerName !== playerX && playerName !== playerO) {
-      return;
     }
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
@@ -53,13 +51,27 @@ export const useGameController = () => {
     const playerName = localStorage.getItem('playerName');
     const currentPlayerName = gameState.currentPlayer === 'X' ? gameState.playerXName : gameState.playerOName;
 
-    if (!playerName || playerName !== currentPlayerName || gameState.winner || gameState.board[index] !== '') {
+    if (gameState.winner || gameState.board[index] !== '') {
       console.log('Jogada inválida:', {
-        playerName,
-        currentPlayerName,
-        currentPlayer: gameState.currentPlayer,
         winner: gameState.winner,
         cellOccupied: gameState.board[index] !== ''
+      });
+      return;
+    }
+
+    if (!playerName || (playerName !== gameState.playerXName && playerName !== gameState.playerOName)) {
+      console.log('Jogador não registrado:', {
+        playerName,
+        playerX: gameState.playerXName,
+        playerO: gameState.playerOName
+      });
+      return;
+    }
+
+    if (playerName !== currentPlayerName) {
+      console.log('Não é sua vez:', {
+        playerName,
+        currentPlayerName
       });
       return;
     }
