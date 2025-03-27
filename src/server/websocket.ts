@@ -2,8 +2,18 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { Room } from '@/hooks/useRoomController';
 
 export interface RoomUpdate {
-  type: 'CREATE' | 'JOIN' | 'LEAVE' | 'UPDATE_STATUS';
-  room: Room;
+  type: 'CREATE' | 'JOIN' | 'LEAVE' | 'UPDATE_STATUS' | 'GAME_MOVE';
+  room?: Room;
+  gameState?: {
+    board: string[];
+    currentPlayer: string;
+    playerXName: string;
+    playerOName: string;
+    playerXScore: number;
+    playerOScore: number;
+    winner: string | null;
+    history: { player: string; position: number; winner: string | null }[];
+  };
 }
 
 const wss = new WebSocketServer({ port: 3001 });
@@ -16,15 +26,24 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (message) => {
     try {
-      const update = JSON.parse(message.toString());
+      const update: RoomUpdate = JSON.parse(message.toString());
       console.log('Received update:', update);
       
-      // Broadcast the update to all connected clients except the sender
-      clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(update));
-        }
-      });
+      if (update.type === 'GAME_MOVE' && update.gameState) {
+        // Broadcast the game move to all connected clients
+        clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(update));
+          }
+        });
+      } else {
+        // For other updates, broadcast to all clients except the sender
+        clients.forEach((client) => {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(update));
+          }
+        });
+      }
     } catch (error) {
       console.error('Error processing message:', error);
     }
