@@ -40,6 +40,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (playerName.trim()) {
+      localStorage.setItem('playerName', playerName.trim());
       setIsNameSubmitted(true);
       if (initialRoomId) {
         const room = rooms.find(r => r.id === initialRoomId);
@@ -57,8 +58,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
         handleJoinRoom(initialRoomId);
       }
     }
-  }, [isNameSubmitted, initialRoomId, rooms]);
-
+  }, [isNameSubmitted, initialRoomId, rooms, handleJoinRoom]);
 
   if (!isNameSubmitted) {
     return (
