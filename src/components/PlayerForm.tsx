@@ -7,7 +7,7 @@ export default function PlayerForm({ onStart }: PlayerFormProps) {
   const [playerX, setPlayerX] = useState('');
   const [playerO, setPlayerO] = useState('');
   const [showForm, setShowForm] = useState(true);
-  const maxLength = 30;
+  const maxLength = 20;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

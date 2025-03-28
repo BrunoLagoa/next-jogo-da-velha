@@ -12,6 +12,7 @@ interface LobbyProps {
 
 export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: LobbyProps) {
   const [newRoomName, setNewRoomName] = useState('');
+  const maxLength = 20;
 
   const handleCreateRoom = () => {
     if (!newRoomName.trim()) return;
@@ -28,6 +29,7 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
             type="text"
             value={newRoomName}
             onChange={(e) => setNewRoomName(e.target.value)}
+            maxLength={maxLength}
             placeholder="Nome da sala"
             className="flex-1 px-4 py-2 rounded bg-gray-700 text-white"
           />
@@ -39,6 +41,7 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
             Criar Sala
           </button>
         </div>
+        <p className="text-xs text-gray-400 px-1 mt-1">{newRoomName.length}/{maxLength} caracteres</p>
       </div>
 
       <div>

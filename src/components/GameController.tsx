@@ -13,7 +13,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
   const [playerName, setPlayerName] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const { rooms, createRoom, joinRoom, leaveRoom } = useRoomController();
-  const maxLength = 30;
+  const maxLength = 20;
 
   const handleCreateRoom = async (name: string) => {
     if (!playerName || !name.trim()) return;
