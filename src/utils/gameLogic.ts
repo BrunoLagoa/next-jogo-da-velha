@@ -11,16 +11,19 @@ export type GameState = {
   history: { player: string; position: number; winner: string | null }[];
 };
 
-export const getInitialGameState = (currentState: GameState): GameState => ({
-  board: Array(GAME_CONFIG.BOARD_SIZE).fill(''),
-  currentPlayer: GAME_CONFIG.PLAYERS.X.SYMBOL,
-  winner: null,
-  history: [],
-  playerXName: currentState.playerXName,
-  playerOName: currentState.playerOName,
-  playerXScore: currentState.playerXScore,
-  playerOScore: currentState.playerOScore
-});
+export const getInitialGameState = (currentState: GameState): GameState => {
+  const randomPlayer = Math.random() < 0.5 ? GAME_CONFIG.PLAYERS.X.SYMBOL : GAME_CONFIG.PLAYERS.O.SYMBOL;
+  return {
+    board: Array(GAME_CONFIG.BOARD_SIZE).fill(''),
+    currentPlayer: randomPlayer,
+    winner: null,
+    history: [],
+    playerXName: currentState.playerXName,
+    playerOName: currentState.playerOName,
+    playerXScore: currentState.playerXScore,
+    playerOScore: currentState.playerOScore
+  };
+};
 
 export const checkWinner = (board: string[]): string | null => {
 
