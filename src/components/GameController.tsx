@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRoomController } from '@/hooks/useRoomController';
 import Lobby from '@/components/Lobby';
 import GameRoom from '@/components/GameRoom';
@@ -25,11 +25,11 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
     }
   };
 
-  const handleJoinRoom = (roomId: string) => {
+  const handleJoinRoom = useCallback((roomId: string) => {
     if (!playerName) return;
     joinRoom(roomId, playerName);
     setSelectedRoomId(roomId);
-  };
+  }, [joinRoom, playerName]);
 
   const handleLeaveRoom = (roomId: string, playerName: string) => {
     leaveRoom(roomId, playerName);

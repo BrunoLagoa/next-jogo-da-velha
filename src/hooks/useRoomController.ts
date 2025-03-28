@@ -56,7 +56,7 @@ export const useRoomController = () => {
 
   const createRoom = (name: string, playerName: string) => {
     const newRoom: Room = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${Math.random().toString(36).substring(2, 9)}`,
       name,
       playerX: playerName,
       playerO: null,
