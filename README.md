@@ -7,7 +7,7 @@ Este é um projeto de Jogo da Velha desenvolvido com Next.js, criado usando [`cr
 - [Next.js](https://nextjs.org)
 - [React](https://reactjs.org)
 - [TypeScript](https://www.typescriptlang.org)
-- WebSocket - Para comunicação em tempo real entre jogadores
+- [Pusher](https://pusher.com) - Para comunicação em tempo real entre jogadores
 
 ## Como Executar o Projeto
 
@@ -29,13 +29,19 @@ bun install
 nvm use
 ```
 
-3. Em um terminal, inicie o servidor WebSocket:
+3. Configure as credenciais do Pusher no arquivo `src/config/pusherConfig.ts`:
 
-```bash
-npx ts-node --esm src/server/websocket.ts
+```typescript
+export const pusherConfig = {
+  appId: 'SEU_APP_ID',
+  key: 'SUA_KEY',
+  secret: 'SEU_SECRET',
+  cluster: 'SEU_CLUSTER',
+  useTLS: true
+};
 ```
 
-4. Em outro terminal, inicie o servidor de desenvolvimento Next.js:
+4. Inicie o servidor de desenvolvimento Next.js:
 
 ```bash
 npm run dev
@@ -49,7 +55,7 @@ bun dev
 
 5. Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-**Importante**: O servidor WebSocket deve estar rodando para que o jogo multiplayer funcione corretamente. Se você encontrar algum erro ao iniciar o servidor WebSocket, certifique-se de que está usando a versão correta do Node.js conforme especificado no arquivo `.nvmrc`.
+**Importante**: Certifique-se de configurar corretamente as credenciais do Pusher para que o jogo multiplayer funcione corretamente.
 
 ## Estrutura do Projeto
 

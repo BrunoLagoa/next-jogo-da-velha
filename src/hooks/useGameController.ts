@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getInitialGameState, makeMove, GameState } from '@/utils/gameLogic';
-import { websocketService } from '@/services/websocketService';
+import { pusherService } from '@/services/pusherService';
 
 export const useGameController = () => {
   const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
@@ -17,7 +17,7 @@ export const useGameController = () => {
   }));
 
   useEffect(() => {
-    const unsubscribe = websocketService.onUpdate((update) => {
+    const unsubscribe = pusherService.onUpdate((update) => {
       if (update.type === 'GAME_MOVE') {
         setGameState(prevState => update.gameState || prevState);
       }
@@ -42,7 +42,7 @@ export const useGameController = () => {
       currentPlayer: 'X',
       winner: null
     });
-    websocketService.sendUpdate({
+    pusherService.sendUpdate({
       type: 'GAME_MOVE',
       gameState: initialState
     });
@@ -80,7 +80,7 @@ export const useGameController = () => {
     }
 
     const newGameState = makeMove(gameState, index);
-    websocketService.sendUpdate({
+    pusherService.sendUpdate({
       type: 'GAME_MOVE',
       gameState: newGameState
     });
@@ -98,7 +98,7 @@ export const useGameController = () => {
       currentPlayer: 'X',
       winner: null
     });
-    websocketService.sendUpdate({
+    pusherService.sendUpdate({
       type: 'GAME_MOVE',
       gameState: newState
     });
@@ -113,7 +113,7 @@ export const useGameController = () => {
       playerXScore: gameState.playerXScore,
       playerOScore: gameState.playerOScore
     };
-    websocketService.sendUpdate({
+    pusherService.sendUpdate({
       type: 'GAME_MOVE',
       gameState: newState
     });

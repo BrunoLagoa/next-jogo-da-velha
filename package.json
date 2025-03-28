@@ -2,7 +2,6 @@
   "name": "jogo-da-velha",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -13,6 +12,8 @@
     "@types/ws": "^8.18.0",
     "@vercel/speed-insights": "^1.2.0",
     "next": "15.2.3",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0",
     "react": "^19.0.0",
     "react-confetti": "^6.4.0",
     "react-dom": "^19.0.0",

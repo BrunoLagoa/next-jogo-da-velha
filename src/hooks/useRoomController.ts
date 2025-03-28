@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { websocketService } from '@/services/websocketService';
+import { pusherService } from '@/services/pusherService';
 
 export interface Room {
   id: string;
@@ -15,20 +15,26 @@ export const useRoomController = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
 
   useEffect(() => {
-    websocketService.connect();
+    // Carregar salas existentes
+    fetch('/api/rooms')
+      .then(response => response.json())
+      .then(data => setRooms(data))
+      .catch(error => console.error('Erro ao carregar salas:', error));
 
-    const unsubscribe = websocketService.onUpdate((update) => {
+    const unsubscribe = pusherService.onUpdate((update) => {
+      if (!update.room) return;
+
       switch (update.type) {
         case 'CREATE':
-          setRooms(prevRooms => [...prevRooms, update.room]);
+          setRooms(prevRooms => [...prevRooms, update.room as Room]);
           break;
         case 'JOIN':
         case 'LEAVE':
         case 'UPDATE_STATUS':
           setRooms(prevRooms =>
             prevRooms.map(room =>
-              room.id === update.room.id ? update.room : room
-            )
+              room.id === update.room?.id ? { ...update.room } : room
+            ) as Room[]
           );
           break;
       }
@@ -36,7 +42,6 @@ export const useRoomController = () => {
 
     return () => {
       unsubscribe();
-      websocketService.disconnect();
     };
   }, []);
 
@@ -51,7 +56,7 @@ export const useRoomController = () => {
 
   const createRoom = (name: string, playerName: string) => {
     const newRoom: Room = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       playerX: playerName,
       playerO: null,
@@ -59,32 +64,30 @@ export const useRoomController = () => {
     };
 
     setRooms(prevRooms => [...prevRooms, newRoom]);
-    websocketService.sendUpdate({ type: 'CREATE', room: newRoom });
+    pusherService.sendUpdate({ type: 'CREATE', room: newRoom });
     return newRoom;
   };
 
   const joinRoom = (roomId: string, playerName: string) => {
-    setRooms(prevRooms => {
-      const updatedRooms = prevRooms.map(room => {
-        if (room.id === roomId) {
-          if (!room.playerX) {
-            const updatedRoom: Room = { ...room, playerX: playerName };
-            websocketService.sendUpdate({ type: 'JOIN', room: updatedRoom });
-            return updatedRoom;
-          } else if (!room.playerO) {
-            const updatedRoom: Room = {
-              ...room,
-              playerO: playerName,
-              status: 'playing'
-            };
-            websocketService.sendUpdate({ type: 'JOIN', room: updatedRoom });
-            return updatedRoom;
-          }
-        }
-        return room;
-      });
-      return updatedRooms;
-    });
+    const room = getRoomById(roomId);
+    if (!room) return;
+
+    if (room.playerX === playerName || room.playerO === playerName) return;
+
+    let updatedRoom: Room | null = null;
+
+    if (!room.playerX) {
+      updatedRoom = { ...room, playerX: playerName };
+    } else if (!room.playerO) {
+      updatedRoom = { ...room, playerO: playerName, status: 'playing' };
+    }
+
+    if (updatedRoom) {
+      setRooms(prevRooms =>
+        prevRooms.map(r => r.id === roomId ? updatedRoom! : r).filter((room): room is Room => room !== undefined)
+      );
+      pusherService.sendUpdate({ type: 'JOIN', room: updatedRoom });
+    }
   };
 
   const updateRoomStatus = (roomId: string, status: Room['status']) => {
@@ -92,34 +95,41 @@ export const useRoomController = () => {
       const updatedRooms = prevRooms.map(room => {
         if (room.id === roomId) {
           const updatedRoom: Room = { ...room, status };
-          websocketService.sendUpdate({ type: 'UPDATE_STATUS', room: updatedRoom });
+          pusherService.sendUpdate({ type: 'UPDATE_STATUS', room: updatedRoom });
           return updatedRoom;
         }
         return room;
-      });
+      }) as Room[];
       return updatedRooms;
     });
   };
 
   const leaveRoom = (roomId: string, playerName: string) => {
-    setRooms(prevRooms => {
-      const updatedRooms = prevRooms.map(room => {
-        if (room.id === roomId) {
-          let updatedRoom: Room;
-          if (room.playerX === playerName) {
-            updatedRoom = { ...room, playerX: null, status: 'waiting' } as Room;
-          } else if (room.playerO === playerName) {
-            updatedRoom = { ...room, playerO: null, status: 'waiting' } as Room;
-          } else {
-            return room;
-          }
-          websocketService.sendUpdate({ type: 'LEAVE', room: updatedRoom });
-          return updatedRoom;
+    const room = getRoomById(roomId);
+    if (!room) return;
+
+    if (room.playerX !== playerName && room.playerO !== playerName) return;
+
+    let updatedRoom: Room | null = null;
+
+    if (room.playerX === playerName) {
+      updatedRoom = { ...room, playerX: null, status: 'waiting' };
+    } else if (room.playerO === playerName) {
+      updatedRoom = { ...room, playerO: null, status: 'waiting' };
+    }
+
+    if (updatedRoom) {
+      setRooms(prevRooms => {
+        // Se ambos os jogadores saíram, remove a sala
+        if (!updatedRoom!.playerX && !updatedRoom!.playerO) {
+          return prevRooms.filter(r => r.id !== roomId);
         }
-        return room;
+        // Atualiza a sala existente
+        return prevRooms.map(r => r.id === roomId ? updatedRoom! : r)
+          .filter((room): room is Room => room !== undefined);
       });
-      return updatedRooms;
-    });
+      pusherService.sendUpdate({ type: 'LEAVE', room: updatedRoom });
+    }
   };
 
   return {
