@@ -13,6 +13,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
   const [playerName, setPlayerName] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const { rooms, createRoom, joinRoom, leaveRoom } = useRoomController();
+  const maxLength = 30;
 
   const handleCreateRoom = async (name: string) => {
     if (!playerName || !name.trim()) return;
@@ -75,6 +76,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
+                maxLength={maxLength}
                 placeholder="Digite seu nome"
                 className="flex-1 px-4 py-2 rounded bg-gray-700 text-white"
               />
@@ -86,6 +88,7 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
                 Confirmar
               </button>
             </div>
+            <p className="text-xs text-gray-400 px-1 mt-1">{playerName.length}/{maxLength} caracteres</p>
           </form>
         </main>
       </div>

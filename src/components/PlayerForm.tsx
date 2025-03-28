@@ -7,6 +7,7 @@ export default function PlayerForm({ onStart }: PlayerFormProps) {
   const [playerX, setPlayerX] = useState('');
   const [playerO, setPlayerO] = useState('');
   const [showForm, setShowForm] = useState(true);
+  const maxLength = 30;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +31,12 @@ export default function PlayerForm({ onStart }: PlayerFormProps) {
               type="text"
               value={playerX}
               onChange={(e) => setPlayerX(e.target.value)}
+              maxLength={maxLength}
               className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Nome do Jogador X"
               required
             />
+            <p className="text-xs text-gray-400 px-1 mt-1">{playerX.length}/{maxLength} caracteres</p>
           </div>
           
           <div>
@@ -42,10 +45,12 @@ export default function PlayerForm({ onStart }: PlayerFormProps) {
               type="text"
               value={playerO}
               onChange={(e) => setPlayerO(e.target.value)}
+              maxLength={maxLength}
               className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Nome do Jogador O"
               required
             />
+            <p className="text-xs text-gray-400 px-1 mt-1">{playerO.length}/{maxLength} caracteres</p>
           </div>
         </div>
 
