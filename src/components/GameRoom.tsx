@@ -6,13 +6,7 @@ import Board from '@/components/Board';
 import GameStatus from '@/components/GameStatus';
 import GameHistory from '@/components/GameHistory';
 import Scoreboard from '@/components/Scoreboard';
-import { Room } from '@/hooks/useRoomController';
-
-interface GameRoomProps {
-  room: Room;
-  playerName: string;
-  onLeaveRoom: (roomId: string, playerName: string) => void;
-}
+import { GameRoomProps } from '@/types/gameRoomTypes';
 
 export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProps) {
   const { gameState, handleStart, handleCellClick, handleRestart, handleContinue } = useGameController();

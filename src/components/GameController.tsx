@@ -4,10 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRoomController } from '@/hooks/useRoomController';
 import Lobby from '@/components/Lobby';
 import GameRoom from '@/components/GameRoom';
-
-interface GameControllerProps {
-  initialRoomId?: string;
-}
+import { GameControllerProps } from '@/types/gameControllerTypes';
 
 export default function GameController({ initialRoomId }: GameControllerProps) {
   const [playerName, setPlayerName] = useState('');

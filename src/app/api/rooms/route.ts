@@ -1,14 +1,7 @@
+import { RoomProps } from '@/types/roomTypes';
 import { NextResponse } from 'next/server';
 
-interface Room {
-  id: string;
-  name: string;
-  playerX: string | null;
-  playerO: string | null;
-  status: 'waiting' | 'playing' | 'finished';
-}
-
-const rooms: Room[] = [];
+const rooms: RoomProps[] = [];
 
 export async function GET() {
   try {

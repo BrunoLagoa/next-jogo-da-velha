@@ -1,14 +1,7 @@
 "use client";
 
+import { LobbyProps } from '@/types/lobbyTypes';
 import { useState } from 'react';
-import { Room } from '@/hooks/useRoomController';
-
-interface LobbyProps {
-  rooms: Room[];
-  playerName: string;
-  onCreateRoom: (name: string) => void;
-  onJoinRoom: (roomId: string) => void;
-}
 
 export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: LobbyProps) {
   const [newRoomName, setNewRoomName] = useState('');

@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface MessageDisplayProps {
-  winner: string | null;
-  isDraw: boolean;
-  currentPlayer: string;
-}
+import { MessageDisplayProps } from '@/types/messageDisplayTypes';
 
 const MessageDisplay: React.FC<MessageDisplayProps> = ({ winner, isDraw, currentPlayer }) => {
   return (

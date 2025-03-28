@@ -1,6 +1,6 @@
 import React from 'react';
-import { BoardProps } from '@/types/boardTypes';
 import Cell from './Cell';
+import { BoardProps } from '@/types/boardTypes';
 
 const Board: React.FC<BoardProps> = ({ gameState, onCellClick }) => {
   return (

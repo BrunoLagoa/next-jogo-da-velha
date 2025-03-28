@@ -1,11 +1,5 @@
 import React from 'react';
-
-interface CellProps {
-  value: string;
-  index: number;
-  disabled: boolean;
-  onClick: (index: number) => void;
-}
+import { CellProps } from '@/types/cellTypes';
 
 const Cell: React.FC<CellProps> = ({ value, index, disabled, onClick }) => {
   return (

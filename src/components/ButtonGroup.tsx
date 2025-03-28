@@ -1,11 +1,7 @@
 import React from 'react';
 import ContinueButton from './ContinueButton';
 import RestartButton from './RestartButton';
-
-interface ButtonGroupProps {
-  onContinue: () => void;
-  onRestart: () => void;
-}
+import { ButtonGroupProps } from '@/types/buttonGroupTypes';
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({ onContinue, onRestart }) => {
   return (
