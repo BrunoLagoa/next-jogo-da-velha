@@ -1,27 +1,6 @@
 import Pusher from 'pusher-js';
 import { pusherConfig, GAME_CHANNEL, GAME_EVENTS } from '@/config/pusherConfig';
-
-interface RoomUpdate {
-  type: 'CREATE' | 'JOIN' | 'LEAVE' | 'UPDATE_STATUS' | 'GAME_MOVE';
-  room?: {
-    id: string;
-    name: string;
-    playerX: string | null;
-    playerO: string | null;
-    status: 'waiting' | 'playing' | 'finished';
-  };
-  gameState?: {
-    board: string[];
-    currentPlayer: string;
-    playerXName: string;
-    playerOName: string;
-    playerXScore: number;
-    playerOScore: number;
-    winner: string | null;
-    history: { player: string; position: number; winner: string | null }[];
-  };
-}
-
+import { RoomUpdate } from '@/types/roomTypes';
 class PusherService {
   private pusher: Pusher;
   private channel: import('pusher-js').Channel;

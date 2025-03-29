@@ -1,4 +1,4 @@
-import { GameState } from '@/utils/gameLogic';
+import { GameState } from "@/types/gameStateTypes";
 
 export const useScoreboardLogic = (gameState: GameState) => {
   const calculateWins = () => {

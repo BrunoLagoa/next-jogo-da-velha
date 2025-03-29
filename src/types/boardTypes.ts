@@ -1,4 +1,4 @@
-import { GameState } from "@/utils/gameLogic";
+import { GameState } from "./gameStateTypes";
 
 export interface BoardProps {
   gameState: GameState;

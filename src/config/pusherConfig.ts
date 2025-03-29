@@ -1,4 +1,3 @@
-// Configuração do Pusher
 export const pusherConfig = {
   appId: process.env.PUSHER_APP_ID || '',
   key: process.env.NEXT_PUBLIC_PUSHER_KEY || '',
@@ -7,7 +6,6 @@ export const pusherConfig = {
   useTLS: true
 };
 
-// Nome do canal e eventos do Pusher
 export const GAME_CHANNEL = 'game-channel';
 export const GAME_EVENTS = {
   ROOM_UPDATE: 'room-update',
