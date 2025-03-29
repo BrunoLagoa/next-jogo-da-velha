@@ -1,18 +1,9 @@
 import { GAME_CONFIG } from '@/config/gameConfig';
-
-export type GameState = {
-  board: string[];
-  currentPlayer: string;
-  playerXName: string;
-  playerOName: string;
-  playerXScore: number;
-  playerOScore: number;
-  winner: string | null;
-  history: { player: string; position: number; winner: string | null }[];
-};
+import { GameState } from '@/types/gameStateTypes';
 
 export const getInitialGameState = (currentState: GameState): GameState => {
   const randomPlayer = Math.random() < 0.5 ? GAME_CONFIG.PLAYERS.X.SYMBOL : GAME_CONFIG.PLAYERS.O.SYMBOL;
+  
   return {
     board: Array(GAME_CONFIG.BOARD_SIZE).fill(''),
     currentPlayer: randomPlayer,
@@ -26,7 +17,6 @@ export const getInitialGameState = (currentState: GameState): GameState => {
 };
 
 export const checkWinner = (board: string[]): string | null => {
-
   for (const combination of GAME_CONFIG.WINNING_COMBINATIONS) {
     const [a, b, c] = combination;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {

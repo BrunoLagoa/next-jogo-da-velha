@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { GameState } from '../utils/gameLogic';
+import { GameState } from '@/types/gameStateTypes';
 
 export const useGameLogic = () => {
   const checkWinner = useCallback((board: string[]): string | null => {

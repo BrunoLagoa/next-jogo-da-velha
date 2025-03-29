@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { getInitialGameState, makeMove, GameState } from '@/utils/gameLogic';
+import { getInitialGameState, makeMove } from '@/utils/gameLogic';
 import { pusherService } from '@/services/pusherService';
+import { GameState } from '@/types/gameStateTypes';
 
 export const useGameController = () => {
   const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
