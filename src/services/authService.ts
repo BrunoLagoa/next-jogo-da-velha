@@ -26,14 +26,20 @@ export const authService = {
   },
 
   updateSession: async (session: PlayerSession): Promise<void> => {
-    const response = await fetch('/api/auth', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(session)
-    });
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(session)
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to update session');
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to update session: ${response.status} - ${errorData || response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error updating session:', error);
+      throw error;
     }
   },
 
