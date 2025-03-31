@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getInitialGameState, makeMove } from '@/utils/gameLogic';
 import { pusherService } from '@/services/pusherService';
 import { GameState } from '@/types/gameStateTypes';
+import { authService } from '@/services/authService';
 
 export const useGameController = () => {
   const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
@@ -26,13 +27,16 @@ export const useGameController = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleStart = (playerX: string, playerO: string) => {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) {
-      localStorage.setItem('playerName', playerX);
-    } else if (playerName !== playerX && playerName !== playerO) {
-      localStorage.setItem('playerName', playerO);
+  const handleStart = async (playerX: string, playerO: string) => {
+    let session = await authService.getSession();
+    if (!session) {
+      session = await authService.createSession(playerX);
+    } else if (session.name !== playerX && session.name !== playerO) {
+      session = await authService.createSession(playerO);
     }
+    
+    session.role = session.name === playerX ? 'X' : 'O';
+    await authService.updateSession(session);
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
       history: [], 
@@ -50,8 +54,10 @@ export const useGameController = () => {
     setGameState(initialState);
   };
 
-  const handleCellClick = (index: number) => {
-    const playerName = localStorage.getItem('playerName');
+  const handleCellClick = async (index: number) => {
+    const session = await authService.getSession();
+    if (!session) return;
+    
     const currentPlayerName = gameState.currentPlayer === 'X' ? gameState.playerXName : gameState.playerOName;
 
     if (gameState.winner || gameState.board[index] !== '') {
@@ -62,18 +68,18 @@ export const useGameController = () => {
       return;
     }
 
-    if (!playerName || (playerName !== gameState.playerXName && playerName !== gameState.playerOName)) {
+    if (!session.name || (session.name !== gameState.playerXName && session.name !== gameState.playerOName)) {
       console.log('Jogador não registrado:', {
-        playerName,
+        playerName: session.name,
         playerX: gameState.playerXName,
         playerO: gameState.playerOName
       });
       return;
     }
 
-    if (playerName !== currentPlayerName) {
+    if (session.name !== currentPlayerName) {
       console.log('Não é sua vez:', {
-        playerName,
+        playerName: session.name,
         currentPlayerName,
         currentPlayer: gameState.currentPlayer
       });
