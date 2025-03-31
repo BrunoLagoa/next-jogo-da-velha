@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
 
     await setSessionCookie(session);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(session);
   } catch (error) {
     console.error('Error updating session:', error);
     return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });

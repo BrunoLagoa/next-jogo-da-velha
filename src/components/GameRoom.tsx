@@ -42,7 +42,7 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
 
   return (
     <div className="flex flex-col gap-8 items-center p-4">
-      <div className="flex justify-between items-center w-full max-w-4xl">
+      <div className="flex gap-4 justify-between items-center w-full max-w-4xl">
         <h2 className="text-2xl font-bold">Sala: {room.name}</h2>
         <button
           onClick={handleLeave}
