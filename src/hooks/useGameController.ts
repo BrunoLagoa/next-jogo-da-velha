@@ -36,24 +36,25 @@ export const useGameController = () => {
     let session = await authService.getSession();
     const currentPlayerName = session?.name;
 
-    // Se não houver sessão, cria uma nova com o nome do jogador atual
-    if (!session) {
-      session = await authService.createSession(currentPlayerName || playerX);
-    }
-
-    // Verifica se o jogador atual é um dos jogadores da partida
+    // Se não houver sessão ou o nome do jogador atual não corresponder a nenhum dos jogadores
     if (!currentPlayerName || (currentPlayerName !== playerX && currentPlayerName !== playerO)) {
       console.log('Jogador não autorizado');
       return;
     }
 
+    // Se não houver sessão, cria uma nova com o nome do jogador atual
+    if (!session) {
+      session = await authService.createSession(currentPlayerName);
+    }
+
     // Atualiza a sessão com o papel do jogador
     const role = currentPlayerName === playerO ? 'O' : 'X';
     await authService.updateSession({
-      id: session.id,
-      name: session.name,
+      ...session,
+      name: currentPlayerName,
       role: role
     });
+
 
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
