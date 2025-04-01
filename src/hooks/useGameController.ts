@@ -7,7 +7,7 @@ import { GameState } from '@/types/gameStateTypes';
 import { authService } from '@/services/authService';
 
 export const useGameController = () => {
-  const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
+  const [gameState, setGameState] = useState<GameState>({ 
     board: Array(9).fill(''), 
     history: [], 
     playerXName: '', 
@@ -16,7 +16,7 @@ export const useGameController = () => {
     playerOScore: 0,
     currentPlayer: 'X',
     winner: null
-  }));
+  });
 
   useEffect(() => {
     const unsubscribe = pusherService.onUpdate((update) => {
@@ -28,30 +28,33 @@ export const useGameController = () => {
   }, []);
 
   const handleStart = async (playerX: string, playerO: string) => {
-    let session = await authService.getSession();
-    
-    // Se não houver sessão, cria uma nova baseada no nome do jogador
-    if (!session) {
-      // Verifica se o jogador está se conectando como X ou O
-      const playerName = playerX || playerO;
-      session = await authService.createSession(playerName);
-      session.role = playerName === playerX ? 'X' : 'O';
-    } 
-    // Se já existe sessão, atribui o papel com base no nome do jogador
-    else {
-      if (session.name === playerX) {
-        session.role = 'X';
-      } else if (session.name === playerO) {
-        session.role = 'O';
-      } else {
-        // Se o nome da sessão não corresponde a nenhum jogador, cria nova sessão
-        const availableRole = playerX ? 'O' : 'X';
-        const playerName = availableRole === 'X' ? playerX : playerO;
-        session = await authService.createSession(playerName);
-        session.role = availableRole;
-      }
+    if (!playerX || !playerO) {
+      console.log('Nomes dos jogadores são obrigatórios');
+      return;
     }
-    await authService.updateSession(session);
+
+    let session = await authService.getSession();
+    const currentPlayerName = session?.name;
+
+    // Se não houver sessão, cria uma nova com o nome do jogador atual
+    if (!session) {
+      session = await authService.createSession(currentPlayerName || playerX);
+    }
+
+    // Verifica se o jogador atual é um dos jogadores da partida
+    if (!currentPlayerName || (currentPlayerName !== playerX && currentPlayerName !== playerO)) {
+      console.log('Jogador não autorizado');
+      return;
+    }
+
+    // Atualiza a sessão com o papel do jogador
+    const role = currentPlayerName === playerO ? 'O' : 'X';
+    await authService.updateSession({
+      id: session.id,
+      name: session.name,
+      role: role
+    });
+
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
       history: [], 

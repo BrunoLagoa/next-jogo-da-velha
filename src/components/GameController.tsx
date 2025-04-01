@@ -38,7 +38,6 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (playerName.trim()) {
-      localStorage.setItem('playerName', playerName.trim());
       setIsNameSubmitted(true);
       if (initialRoomId) {
         const room = rooms.find(r => r.id === initialRoomId);
