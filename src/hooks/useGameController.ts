@@ -29,13 +29,28 @@ export const useGameController = () => {
 
   const handleStart = async (playerX: string, playerO: string) => {
     let session = await authService.getSession();
-    if (!session) {
-      session = await authService.createSession(playerX);
-    } else if (session.name !== playerX && session.name !== playerO) {
-      session = await authService.createSession(playerO);
-    }
     
-    session.role = session.name === playerX ? 'X' : 'O';
+    // Se não houver sessão, cria uma nova baseada no nome do jogador
+    if (!session) {
+      // Verifica se o jogador está se conectando como X ou O
+      const playerName = playerX || playerO;
+      session = await authService.createSession(playerName);
+      session.role = playerName === playerX ? 'X' : 'O';
+    } 
+    // Se já existe sessão, atribui o papel com base no nome do jogador
+    else {
+      if (session.name === playerX) {
+        session.role = 'X';
+      } else if (session.name === playerO) {
+        session.role = 'O';
+      } else {
+        // Se o nome da sessão não corresponde a nenhum jogador, cria nova sessão
+        const availableRole = playerX ? 'O' : 'X';
+        const playerName = availableRole === 'X' ? playerX : playerO;
+        session = await authService.createSession(playerName);
+        session.role = availableRole;
+      }
+    }
     await authService.updateSession(session);
     const initialState = getInitialGameState({ 
       board: Array(9).fill(''), 
@@ -58,8 +73,6 @@ export const useGameController = () => {
     const session = await authService.getSession();
     if (!session) return;
     
-    const currentPlayerName = gameState.currentPlayer === 'X' ? gameState.playerXName : gameState.playerOName;
-
     if (gameState.winner || gameState.board[index] !== '') {
       console.log('Jogada inválida:', {
         winner: gameState.winner,
@@ -77,10 +90,9 @@ export const useGameController = () => {
       return;
     }
 
-    if (session.name !== currentPlayerName) {
+    if (session.role !== gameState.currentPlayer) {
       console.log('Não é sua vez:', {
-        playerName: session.name,
-        currentPlayerName,
+        playerRole: session.role,
         currentPlayer: gameState.currentPlayer
       });
       return;

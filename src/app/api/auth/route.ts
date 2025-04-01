@@ -69,9 +69,27 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    const cookieStore = await getCookieStore();
+    const token = cookieStore.get(authConfig.cookieName)?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'No session found' }, { status: 401 });
+    }
+
+    let currentSession;
+    try {
+      currentSession = verify(token, authConfig.jwtSecret as Secret) as PlayerSession;
+    } catch {
+      cookieStore.delete(authConfig.cookieName);
+      return NextResponse.json({ error: 'Invalid session token' }, { status: 401 });
+    }
+
     const session = await request.json() as PlayerSession;
     if (!session || !session.id || !session.name) {
       return NextResponse.json({ error: 'Invalid session data' }, { status: 400 });
+    }
+
+    if (session.id !== currentSession.id) {
+      return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
     }
 
     if (session.role && !['X', 'O'].includes(session.role)) {
