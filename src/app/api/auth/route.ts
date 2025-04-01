@@ -78,7 +78,8 @@ export async function PUT(request: NextRequest) {
     let currentSession;
     try {
       currentSession = verify(token, authConfig.jwtSecret as Secret) as PlayerSession;
-    } catch {
+    } catch (error) {
+      console.error('Error verifying token:', error);
       cookieStore.delete(authConfig.cookieName);
       return NextResponse.json({ error: 'Invalid session token' }, { status: 401 });
     }
@@ -92,13 +93,18 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
     }
 
-    if (session.role && !['X', 'O'].includes(session.role)) {
+    const updatedSession = {
+      ...currentSession,
+      ...session
+    };
+
+    if (updatedSession.role && !['X', 'O'].includes(updatedSession.role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
 
-    await setSessionCookie(session);
+    await setSessionCookie(updatedSession);
 
-    return NextResponse.json(session);
+    return NextResponse.json(updatedSession);
   } catch (error) {
     console.error('Error updating session:', error);
     return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
