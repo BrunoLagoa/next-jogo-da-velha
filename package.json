@@ -14,6 +14,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.2.3",
+    "next-google-adsense": "^1.0.13",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
     "react": "^19.0.0",

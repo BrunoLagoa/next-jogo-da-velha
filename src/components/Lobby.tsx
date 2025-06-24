@@ -2,10 +2,14 @@
 
 import { LobbyProps } from '@/types/lobbyTypes';
 import { useState } from 'react';
+import AdBanner from '@/components/AdBanner';
+import { useAds } from '@/hooks/useAds';
+import { AD_CONFIG } from '@/types/adTypes';
 
 export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: LobbyProps) {
   const [newRoomName, setNewRoomName] = useState('');
   const maxLength = 20;
+  const { isAdEnabled } = useAds();
 
   const handleCreateRoom = () => {
     if (!newRoomName.trim()) return;
@@ -15,6 +19,18 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
+      {/* Banner de anúncio no topo do lobby (se habilitado) */}
+      {isAdEnabled('lobby-banner') && (
+        <div className="mb-6">
+          <AdBanner
+            slot={AD_CONFIG.slots.banner}
+            className="flex justify-center"
+            width={728}
+            height={90}
+          />
+        </div>
+      )}
+
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Criar Nova Sala</h2>
         <div className="flex gap-2">
@@ -70,6 +86,18 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
           )}
         </div>
       </div>
+
+      {/* Banner de anúncio no final (se houver muitas salas) */}
+      {isAdEnabled('lobby-banner') && rooms.length > 5 && (
+        <div className="mt-8">
+          <AdBanner
+            slot={AD_CONFIG.slots.banner}
+            className="flex justify-center"
+            width={728}
+            height={90}
+          />
+        </div>
+      )}
     </div>
   );
 }
