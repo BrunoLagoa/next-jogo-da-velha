@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { getInitialGameState, makeMove } from '@/utils/gameLogic';
 import { pusherService } from '@/services/pusherService';
 import { GameState } from '@/types/gameStateTypes';
+import { authService } from '@/services/authService';
 
 export const useGameController = () => {
-  const [gameState, setGameState] = useState<GameState>(getInitialGameState({ 
+  const [gameState, setGameState] = useState<GameState>({ 
     board: Array(9).fill(''), 
     history: [], 
     playerXName: '', 
@@ -15,77 +16,106 @@ export const useGameController = () => {
     playerOScore: 0,
     currentPlayer: 'X',
     winner: null
-  }));
+  });
+  const [gameInitialized, setGameInitialized] = useState(false);
 
   useEffect(() => {
     const unsubscribe = pusherService.onUpdate((update) => {
       if (update.type === 'GAME_MOVE') {
         setGameState(prevState => update.gameState || prevState);
+        setGameInitialized(true);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  const handleStart = (playerX: string, playerO: string) => {
-    const playerName = localStorage.getItem('playerName');
-    if (!playerName) {
-      localStorage.setItem('playerName', playerX);
-    } else if (playerName !== playerX && playerName !== playerO) {
-      localStorage.setItem('playerName', playerO);
+  const handleStart = async (playerX: string, playerO: string) => {
+    if (!playerX || !playerO) {
+      return;
     }
-    const initialState = getInitialGameState({ 
-      board: Array(9).fill(''), 
-      history: [], 
-      playerXName: playerX, 
-      playerOName: playerO, 
-      playerXScore: 0, 
-      playerOScore: 0,
-      currentPlayer: 'X',
-      winner: null
-    });
-    pusherService.sendUpdate({
-      type: 'GAME_MOVE',
-      gameState: initialState
-    });
-    setGameState(initialState);
+
+    // Evita múltiplas inicializações
+    if (gameInitialized || gameState.playerXName) {
+      return;
+    }
+
+    try {
+      const session = await authService.getSession();
+      
+      if (!session || !session.name) {
+        return;
+      }
+
+      const currentPlayerName = session.name;
+
+      // Verificar se o jogador atual faz parte desta sala
+      if (currentPlayerName !== playerX && currentPlayerName !== playerO) {
+        return;
+      }
+
+      // Determinar role do jogador
+      const role = currentPlayerName === playerO ? 'O' : 'X';
+      
+      // Atualizar sessão com o papel do jogador
+      await authService.updateSession({
+        ...session,
+        name: currentPlayerName,
+        role: role
+      });
+
+      // Apenas o jogador X inicia o jogo para evitar conflitos
+      if (role === 'X') {
+        const initialState = getInitialGameState({ 
+          board: Array(9).fill(''), 
+          history: [], 
+          playerXName: playerX, 
+          playerOName: playerO, 
+          playerXScore: 0, 
+          playerOScore: 0,
+          currentPlayer: 'X',
+          winner: null
+        });
+        
+        pusherService.sendUpdate({
+          type: 'GAME_MOVE',
+          gameState: initialState
+        });
+        setGameState(initialState);
+        setGameInitialized(true);
+      }
+    } catch (error) {
+      console.error('Erro ao inicializar jogo:', error);
+    }
   };
 
-  const handleCellClick = (index: number) => {
-    const playerName = localStorage.getItem('playerName');
-    const currentPlayerName = gameState.currentPlayer === 'X' ? gameState.playerXName : gameState.playerOName;
+  const handleCellClick = async (index: number) => {
+    try {
+      const session = await authService.getSession();
+      if (!session) {
+        return;
+      }
+      
+      if (gameState.winner || gameState.board[index] !== '') {
+        return;
+      }
 
-    if (gameState.winner || gameState.board[index] !== '') {
-      console.log('Jogada inválida:', {
-        winner: gameState.winner,
-        cellOccupied: gameState.board[index] !== ''
+      if (!session.name || (session.name !== gameState.playerXName && session.name !== gameState.playerOName)) {
+        return;
+      }
+
+      if (session.role !== gameState.currentPlayer) {
+        return;
+      }
+
+      const newGameState = makeMove(gameState, index);
+      pusherService.sendUpdate({
+        type: 'GAME_MOVE',
+        gameState: newGameState
       });
-      return;
+      setGameState(newGameState);
+    } catch (error) {
+      console.error('Erro ao fazer jogada:', error);
     }
-
-    if (!playerName || (playerName !== gameState.playerXName && playerName !== gameState.playerOName)) {
-      console.log('Jogador não registrado:', {
-        playerName,
-        playerX: gameState.playerXName,
-        playerO: gameState.playerOName
-      });
-      return;
-    }
-
-    if (playerName !== currentPlayerName) {
-      console.log('Não é sua vez:', {
-        playerName,
-        currentPlayerName,
-        currentPlayer: gameState.currentPlayer
-      });
-      return;
-    }
-
-    const newGameState = makeMove(gameState, index);
-    pusherService.sendUpdate({
-      type: 'GAME_MOVE',
-      gameState: newGameState
-    });
-    setGameState(newGameState);
   };
 
   const handleRestart = () => {
@@ -104,6 +134,7 @@ export const useGameController = () => {
       gameState: newState
     });
     setGameState(newState);
+    setGameInitialized(true);
   };
 
   const handleContinue = () => {
@@ -119,6 +150,7 @@ export const useGameController = () => {
       gameState: newState
     });
     setGameState(newState);
+    setGameInitialized(true);
   };
 
   return {

@@ -28,6 +28,15 @@ export const useGameLogic = () => {
   }, []);
 
   const getGameStatus = useCallback((state: GameState) => {
+    // Se já há um winner definido no estado (incluindo 'draw'), usa ele
+    if (state.winner) {
+      return {
+        winner: state.winner === 'draw' ? null : state.winner,
+        isDraw: state.winner === 'draw'
+      };
+    }
+
+    // Caso contrário, calcula baseado no tabuleiro
     const winner = checkWinner(state.board);
     const isDraw = !winner && checkDraw(state.board);
 

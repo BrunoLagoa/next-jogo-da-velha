@@ -28,13 +28,23 @@ export const useRoomController = () => {
         case 'CREATE':
           setRooms(prevRooms => [...prevRooms, update.room as Room]);
           break;
-        case 'JOIN':
         case 'LEAVE':
+          setRooms(prevRooms => {
+            const updatedRoom = update.room as Room;
+            if (!updatedRoom.playerX && !updatedRoom.playerO) {
+              return prevRooms.filter(r => r.id !== updatedRoom.id);
+            }
+            return prevRooms.map(room =>
+              room.id === updatedRoom.id ? updatedRoom : room
+            );
+          });
+          break;
+        case 'JOIN':
         case 'UPDATE_STATUS':
           setRooms(prevRooms =>
             prevRooms.map(room =>
               room.id === update.room?.id ? { ...update.room } : room
-            ) as Room[]
+            )
           );
           break;
       }
