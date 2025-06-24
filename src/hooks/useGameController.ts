@@ -17,11 +17,13 @@ export const useGameController = () => {
     currentPlayer: 'X',
     winner: null
   });
+  const [gameInitialized, setGameInitialized] = useState(false);
 
   useEffect(() => {
     const unsubscribe = pusherService.onUpdate((update) => {
       if (update.type === 'GAME_MOVE') {
         setGameState(prevState => update.gameState || prevState);
+        setGameInitialized(true);
       }
     });
     return () => unsubscribe();
@@ -29,85 +31,91 @@ export const useGameController = () => {
 
   const handleStart = async (playerX: string, playerO: string) => {
     if (!playerX || !playerO) {
-      console.log('Nomes dos jogadores são obrigatórios');
       return;
     }
 
-    let session = await authService.getSession();
-    const currentPlayerName = session?.name;
-
-    // Se não houver sessão ou o nome do jogador atual não corresponder a nenhum dos jogadores
-    if (!currentPlayerName || (currentPlayerName !== playerX && currentPlayerName !== playerO)) {
-      console.log('Jogador não autorizado');
+    // Evita múltiplas inicializações
+    if (gameInitialized || gameState.playerXName) {
       return;
     }
 
-    // Se não houver sessão, cria uma nova com o nome do jogador atual
-    if (!session) {
-      session = await authService.createSession(currentPlayerName);
+    try {
+      const session = await authService.getSession();
+      
+      if (!session || !session.name) {
+        return;
+      }
+
+      const currentPlayerName = session.name;
+
+      // Verificar se o jogador atual faz parte desta sala
+      if (currentPlayerName !== playerX && currentPlayerName !== playerO) {
+        return;
+      }
+
+      // Determinar role do jogador
+      const role = currentPlayerName === playerO ? 'O' : 'X';
+      
+      // Atualizar sessão com o papel do jogador
+      await authService.updateSession({
+        ...session,
+        name: currentPlayerName,
+        role: role
+      });
+
+      // Apenas o jogador X inicia o jogo para evitar conflitos
+      if (role === 'X') {
+        const initialState = getInitialGameState({ 
+          board: Array(9).fill(''), 
+          history: [], 
+          playerXName: playerX, 
+          playerOName: playerO, 
+          playerXScore: 0, 
+          playerOScore: 0,
+          currentPlayer: 'X',
+          winner: null
+        });
+        
+        pusherService.sendUpdate({
+          type: 'GAME_MOVE',
+          gameState: initialState
+        });
+        setGameState(initialState);
+        setGameInitialized(true);
+      }
+    } catch (error) {
+      console.error('Erro ao inicializar jogo:', error);
     }
-
-    // Atualiza a sessão com o papel do jogador
-    const role = currentPlayerName === playerO ? 'O' : 'X';
-    await authService.updateSession({
-      ...session,
-      name: currentPlayerName,
-      role: role
-    });
-
-
-    const initialState = getInitialGameState({ 
-      board: Array(9).fill(''), 
-      history: [], 
-      playerXName: playerX, 
-      playerOName: playerO, 
-      playerXScore: 0, 
-      playerOScore: 0,
-      currentPlayer: 'X',
-      winner: null
-    });
-    pusherService.sendUpdate({
-      type: 'GAME_MOVE',
-      gameState: initialState
-    });
-    setGameState(initialState);
   };
 
   const handleCellClick = async (index: number) => {
-    const session = await authService.getSession();
-    if (!session) return;
-    
-    if (gameState.winner || gameState.board[index] !== '') {
-      console.log('Jogada inválida:', {
-        winner: gameState.winner,
-        cellOccupied: gameState.board[index] !== ''
-      });
-      return;
-    }
+    try {
+      const session = await authService.getSession();
+      if (!session) {
+        return;
+      }
+      
+      if (gameState.winner || gameState.board[index] !== '') {
+        return;
+      }
 
-    if (!session.name || (session.name !== gameState.playerXName && session.name !== gameState.playerOName)) {
-      console.log('Jogador não registrado:', {
-        playerName: session.name,
-        playerX: gameState.playerXName,
-        playerO: gameState.playerOName
-      });
-      return;
-    }
+      if (!session.name || (session.name !== gameState.playerXName && session.name !== gameState.playerOName)) {
+        return;
+      }
 
-    if (session.role !== gameState.currentPlayer) {
-      console.log('Não é sua vez:', {
-        playerRole: session.role,
-        currentPlayer: gameState.currentPlayer
-      });
-      return;
-    }
+      if (session.role !== gameState.currentPlayer) {
+        return;
+      }
 
-    const newGameState = makeMove(gameState, index);
-    pusherService.sendUpdate({
-      type: 'GAME_MOVE',
-      gameState: newGameState
-    });
-    setGameState(newGameState);
+      const newGameState = makeMove(gameState, index);
+      pusherService.sendUpdate({
+        type: 'GAME_MOVE',
+        gameState: newGameState
+      });
+      setGameState(newGameState);
+    } catch (error) {
+      console.error('Erro ao fazer jogada:', error);
+    }
   };
 
   const handleRestart = () => {
@@ -126,6 +134,7 @@ export const useGameController = () => {
       gameState: newState
     });
     setGameState(newState);
+    setGameInitialized(true);
   };
 
   const handleContinue = () => {
@@ -141,6 +150,7 @@ export const useGameController = () => {
       gameState: newState
     });
     setGameState(newState);
+    setGameInitialized(true);
   };
 
   return {

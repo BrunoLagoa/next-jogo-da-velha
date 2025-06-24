@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useGameController } from '@/hooks/useGameController';
 import Board from '@/components/Board';
 import GameStatus from '@/components/GameStatus';
@@ -11,11 +11,15 @@ import { GameRoomProps } from '@/types/gameRoomTypes';
 export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProps) {
   const { gameState, handleStart, handleCellClick, handleRestart, handleContinue } = useGameController();
 
-  useEffect(() => {
+  const initializeGame = useCallback(async () => {
     if (room.playerX && room.playerO && room.status === 'playing' && !gameState.playerXName) {
-      handleStart(room.playerX, room.playerO);
+      await handleStart(room.playerX, room.playerO);
     }
   }, [room.playerX, room.playerO, room.status, gameState.playerXName, handleStart]);
+
+  useEffect(() => {
+    initializeGame();
+  }, [initializeGame]);
 
   const handleLeave = () => {
     onLeaveRoom(room.id, playerName);
@@ -27,8 +31,10 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
         <h2 className="text-2xl font-bold mb-4">Sala: {room.name}</h2>
         <p className="text-gray-400 mb-4">
           Aguardando outro jogador...
-          {room.playerX ? `${room.playerX} está pronto!` : ''}
-          {room.playerO ? `${room.playerO} está pronto!` : ''}
+          <br />
+          {room.playerX ? `${room.playerX} está pronto!` : 'Aguardando Jogador X...'}
+          <br />
+          {room.playerO ? `${room.playerO} está pronto!` : 'Aguardando Jogador O...'}
         </p>
         <button
           onClick={handleLeave}
@@ -51,10 +57,20 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
           Sair
         </button>
       </div>
-      <Scoreboard gameState={gameState} />
-      <Board gameState={gameState} onCellClick={handleCellClick} />
-      <GameStatus gameState={gameState} onRestart={handleRestart} onContinue={handleContinue} />
-      <GameHistory history={gameState.history} />
+      
+      {gameState.playerXName && gameState.playerOName ? (
+        <>
+          <Scoreboard gameState={gameState} />
+          <Board gameState={gameState} onCellClick={handleCellClick} />
+          <GameStatus gameState={gameState} onRestart={handleRestart} onContinue={handleContinue} />
+          <GameHistory history={gameState.history} />
+        </>
+      ) : (
+        <div className="text-center p-8">
+          <p className="text-gray-400 mb-4">Inicializando jogo...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+        </div>
+      )}
     </div>
   );
 }

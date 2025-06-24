@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRoomController } from '@/hooks/useRoomController';
+import { authService } from '@/services/authService';
 import Lobby from '@/components/Lobby';
 import GameRoom from '@/components/GameRoom';
 import { GameControllerProps } from '@/types/gameControllerTypes';
@@ -15,6 +16,12 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
   const handleCreateRoom = async (name: string) => {
     if (!playerName || !name.trim()) return;
     try {
+      // Garantir que a sessão existe antes de criar a sala
+      let session = await authService.getSession();
+      if (!session) {
+        session = await authService.createSession(playerName);
+      }
+      
       const newRoom = await createRoom(name, playerName);
       setSelectedRoomId(newRoom.id);
     } catch (error) {
@@ -22,10 +29,21 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
     }
   };
 
-  const handleJoinRoom = useCallback((roomId: string) => {
+  const handleJoinRoom = useCallback(async (roomId: string) => {
     if (!playerName) return;
-    joinRoom(roomId, playerName);
-    setSelectedRoomId(roomId);
+    
+    try {
+      // Garantir que a sessão existe antes de entrar na sala
+      let session = await authService.getSession();
+      if (!session) {
+        session = await authService.createSession(playerName);
+      }
+      
+      joinRoom(roomId, playerName);
+      setSelectedRoomId(roomId);
+    } catch (error) {
+      console.error('Erro ao entrar na sala:', error);
+    }
   }, [joinRoom, playerName]);
 
   const handleLeaveRoom = (roomId: string, playerName: string) => {
@@ -35,16 +53,25 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
 
   const [isNameSubmitted, setIsNameSubmitted] = useState(false);
 
-  const handleNameSubmit = (e: React.FormEvent) => {
+  const handleNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (playerName.trim()) {
+    if (!playerName.trim()) return;
+
+    try {
+      // Criar sessão JWT quando o jogador confirma o nome
+      await authService.createSession(playerName.trim());
+      
       setIsNameSubmitted(true);
+      
       if (initialRoomId) {
         const room = rooms.find(r => r.id === initialRoomId);
         if (room && (room.playerX === null || room.playerO === null)) {
           handleJoinRoom(initialRoomId);
         }
       }
+    } catch (error) {
+      console.error('Erro ao criar sessão:', error);
+      alert('Erro ao criar sessão. Tente novamente.');
     }
   };
 

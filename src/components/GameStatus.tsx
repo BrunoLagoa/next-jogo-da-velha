@@ -12,17 +12,19 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart, onContinu
     ? gameState.playerXName 
     : gameState.playerOName;
 
+  const showButtons = gameState.winner || isDraw || gameState.winner === 'draw';
+
   return (
     <div className="flex flex-col items-center gap-4 w-full text-center">
       <MessageDisplay
-        winner={winner === 'X' ? gameState.playerXName : winner === 'O' ? gameState.playerOName : null}
-        isDraw={isDraw}
+        winner={winner === 'X' ? gameState.playerXName : winner === 'O' ? gameState.playerOName : winner}
+        isDraw={isDraw || gameState.winner === 'draw'}
         currentPlayer={currentPlayer}
       />
-      {(gameState.winner || isDraw) && (
+      {showButtons && (
         <ButtonGroup onContinue={onContinue} onRestart={onRestart} />
       )}
-      <ConfettiAnimation winner={gameState.winner} />
+      <ConfettiAnimation winner={gameState.winner && gameState.winner !== 'draw' ? gameState.winner : null} />
     </div>
   );
 };

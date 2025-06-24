@@ -50,9 +50,9 @@ export const makeMove = (state: GameState, index: number): GameState => {
     ...state,
     board: newBoard,
     currentPlayer: state.currentPlayer === GAME_CONFIG.PLAYERS.X.SYMBOL ? GAME_CONFIG.PLAYERS.O.SYMBOL : GAME_CONFIG.PLAYERS.X.SYMBOL,
-    winner: isDraw ? null : winner,
+    winner: isDraw ? 'draw' : winner,
     playerXScore,
     playerOScore,
-    history: [...state.history, { player: state.currentPlayer, position: index, winner: isDraw ? null : winner }]
+    history: [...state.history, { player: state.currentPlayer, position: index, winner: isDraw ? 'draw' : winner }]
   };
 };

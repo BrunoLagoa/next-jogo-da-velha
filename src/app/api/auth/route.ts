@@ -8,7 +8,13 @@ async function getCookieStore() {
 }
 
 async function setSessionCookie(session: PlayerSession) {
-  const token = sign(session, authConfig.jwtSecret as Secret, { expiresIn: `${authConfig.cookieOptions.maxAge}s` });
+  const cleanSession: PlayerSession = {
+    id: session.id,
+    name: session.name,
+    role: session.role
+  };
+  
+  const token = sign(cleanSession, authConfig.jwtSecret as Secret, { expiresIn: `${authConfig.cookieOptions.maxAge}s` });
   const cookieStore = await getCookieStore();
   cookieStore.set(authConfig.cookieName, token, {
     ...authConfig.cookieOptions,
@@ -84,7 +90,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session token' }, { status: 401 });
     }
 
-    const session = await request.json() as PlayerSession;
+    const requestBody = await request.json();
+    const session = requestBody as PlayerSession;
     if (!session || !session.id || !session.name) {
       return NextResponse.json({ error: 'Invalid session data' }, { status: 400 });
     }
