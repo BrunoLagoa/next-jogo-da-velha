@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AD_CONFIG } from '@/types/adTypes';
 
 declare global {
@@ -26,19 +26,37 @@ const AdBanner: React.FC<AdBannerProps> = ({
   responsive = true,
   className = ""
 }) => {
+  const adRef = useRef<HTMLModElement>(null);
+  const initializedRef = useRef(false);
+
   useEffect(() => {
-    try {
-      if (typeof window !== "undefined" && window.adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    // Evita dupla inicialização
+    if (initializedRef.current) return;
+    
+    const timer = setTimeout(() => {
+      try {
+        if (typeof window !== "undefined" && window.adsbygoogle && adRef.current) {
+          // Verifica se o elemento já tem anúncio
+          const hasAd = adRef.current.querySelector('iframe') || 
+                       adRef.current.getAttribute('data-adsbygoogle-status');
+          
+          if (!hasAd) {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            initializedRef.current = true;
+          }
+        }
+      } catch (error) {
+        console.error("AdSense error:", error);
       }
-    } catch (error) {
-      console.error("AdSense error:", error);
-    }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className={`ad-container ${className}`}>
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={{
           display: "block",

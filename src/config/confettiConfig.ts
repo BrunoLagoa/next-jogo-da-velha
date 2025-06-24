@@ -1,4 +1,4 @@
-export const CONFETTI_DURATION_MS = 12000;
+export const CONFETTI_DURATION_MS = 24000; // 24 segundos
 
 export const getConfettiConfig = () => {
   if (typeof window !== 'undefined') {

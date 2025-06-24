@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { AD_CONFIG } from '@/types/adTypes';
 
 interface AdInterstitialProps {
@@ -16,25 +16,52 @@ const AdInterstitial: React.FC<AdInterstitialProps> = ({
 }) => {
   const [countdown, setCountdown] = useState(delaySeconds);
   const [canClose, setCanClose] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  // Atualiza a referência do onClose
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  // Função estável para fechar
+  const handleAutoClose = useCallback(() => {
+    onCloseRef.current();
+  }, []);
 
   useEffect(() => {
+    // Limpa timer anterior
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     if (show) {
       setCountdown(delaySeconds);
       setCanClose(false);
       
-      const timer = setInterval(() => {
+      // Timer único que controla countdown e auto-fechamento
+      timerRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             setCanClose(true);
-            clearInterval(timer);
+            // Fechar automaticamente após mostrar que pode fechar
+            setTimeout(() => {
+              handleAutoClose();
+            }, 2000);
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
 
+      // Timer de segurança para fechar após tempo total (delaySeconds + 2s)
+      const safetyTimer = setTimeout(() => {
+        handleAutoClose();
+      }, (delaySeconds + 2) * 1000);
+
       // Inicializar AdSense para este anúncio
-      setTimeout(() => {
+      const adSenseTimer = setTimeout(() => {
         try {
           if (typeof window !== "undefined" && window.adsbygoogle) {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -44,20 +71,41 @@ const AdInterstitial: React.FC<AdInterstitialProps> = ({
         }
       }, 100);
 
-      return () => clearInterval(timer);
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        clearTimeout(safetyTimer);
+        clearTimeout(adSenseTimer);
+      };
+    } else {
+      // Reset estados quando não está mostrando
+      setCountdown(delaySeconds);
+      setCanClose(false);
     }
-  }, [show, delaySeconds]);
+  }, [show, delaySeconds, handleAutoClose]);
+
+  const handleManualClose = useCallback(() => {
+    // Limpa o timer se o usuário fechar manualmente
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    onCloseRef.current();
+  }, []);
 
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative">
+    <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative shadow-2xl">
         {/* Botão de fechar (só aparece após o countdown) */}
         {canClose && (
           <button
-            onClick={onClose}
-            className="absolute top-2 right-2 w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold"
+            onClick={handleManualClose}
+            className="absolute top-2 right-2 w-8 h-8 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full flex items-center justify-center text-gray-600 font-bold transition-colors"
+            title="Fechar anúncio"
           >
             ×
           </button>
@@ -66,7 +114,14 @@ const AdInterstitial: React.FC<AdInterstitialProps> = ({
         {/* Countdown */}
         {!canClose && (
           <div className="text-center mb-4">
-            <p className="text-gray-600">Fechará em {countdown}s</p>
+            <p className="text-gray-600">Fechará automaticamente em {countdown}s</p>
+          </div>
+        )}
+
+        {/* Mensagem quando pode fechar */}
+        {canClose && (
+          <div className="text-center mb-4">
+            <p className="text-green-600 text-sm">Fechando automaticamente em 2s ou clique no ×</p>
           </div>
         )}
         

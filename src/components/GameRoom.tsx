@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useGameController } from '@/hooks/useGameController';
 import { useAds } from '@/hooks/useAds';
 import Board from '@/components/Board';
@@ -14,35 +14,72 @@ import { AD_CONFIG } from '@/types/adTypes';
 
 export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProps) {
   const { gameState, handleStart, handleCellClick, handleRestart, handleContinue } = useGameController();
-  const { showInterstitial, isAdEnabled, onGameEnd, closeInterstitial } = useAds();
+  const { showInterstitial, isAdEnabled, onGameEnd, onGameStart, closeInterstitial } = useAds();
+
+  // Memoriza o estado do jogo para evitar re-execuções desnecessárias
+  const gameStatus = useMemo(() => {
+    const hasWinner = !!gameState.winner;
+    const isDraw = gameState.board && gameState.board.every(cell => cell !== '') && !gameState.winner;
+    const isGameEnded = hasWinner || isDraw;
+    
+    console.log('GameRoom - Estado do jogo:', {
+      hasWinner,
+      isDraw,
+      isGameEnded,
+      winner: gameState.winner,
+      board: gameState.board,
+      playerXName: gameState.playerXName,
+      playerOName: gameState.playerOName
+    });
+    
+    return {
+      hasWinner,
+      isDraw,
+      isGameEnded,
+      gameId: `${gameState.playerXName}-${gameState.playerOName}-${gameState.history.length}`
+    };
+  }, [gameState.winner, gameState.board, gameState.playerXName, gameState.playerOName, gameState.history.length]);
 
   const initializeGame = useCallback(async () => {
     if (room.playerX && room.playerO && room.status === 'playing' && !gameState.playerXName) {
+      console.log('GameRoom - Inicializando jogo');
       await handleStart(room.playerX, room.playerO);
+      onGameStart(); // Reset do controle de fim de jogo
     }
-  }, [room.playerX, room.playerO, room.status, gameState.playerXName, handleStart]);
+  }, [room.playerX, room.playerO, room.status, gameState.playerXName, handleStart, onGameStart]);
 
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
 
-  // Detectar fim de jogo para anúncios
+  // Detectar fim de jogo para anúncios - com controle de duplicação
   useEffect(() => {
-    if (gameState.winner || (gameState.board && gameState.board.every(cell => cell !== '') && !gameState.winner)) {
-      onGameEnd();
+    console.log('GameRoom - Verificando fim de jogo:', {
+      isGameEnded: gameStatus.isGameEnded,
+      gameId: gameStatus.gameId,
+      showInterstitial
+    });
+    
+    if (gameStatus.isGameEnded) {
+      console.log('GameRoom - Jogo terminou! Chamando onGameEnd');
+      onGameEnd(gameStatus.gameId);
     }
-  }, [gameState.winner, gameState.board, onGameEnd]);
+  }, [gameStatus.isGameEnded, gameStatus.gameId, onGameEnd, showInterstitial]);
 
   const handleLeave = () => {
     onLeaveRoom(room.id, playerName);
   };
 
   const handleRestartWithAd = () => {
+    console.log('GameRoom - Reiniciando jogo');
     handleRestart();
+    onGameStart(); // Reset para o próximo jogo
   };
 
   const handleContinueWithAd = () => {
+    console.log('GameRoom - Continuando jogo');
     handleContinue();
+    onGameStart(); // Reset para o próximo jogo
   };
 
   if (!room.playerX || !room.playerO) {
@@ -143,6 +180,16 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
         onClose={closeInterstitial}
         delaySeconds={5}
       />
+      
+      {/* Debug info - remover depois */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-2 rounded text-xs">
+          <div>Show Banner: {showInterstitial ? 'SIM' : 'NÃO'}</div>
+          <div>Jogo Terminado: {gameStatus.isGameEnded ? 'SIM' : 'NÃO'}</div>
+          <div>Winner: {gameState.winner || 'Nenhum'}</div>
+          <div>GameId: {gameStatus.gameId}</div>
+        </div>
+      )}
     </>
   );
 }
