@@ -13,6 +13,9 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart, onContinu
     : gameState.playerOName;
 
   const showButtons = gameState.winner || isDraw || gameState.winner === 'draw';
+  
+  // Determina o valor correto para o confetti
+  const confettiWinner = winner || (isDraw ? false : null);
 
   return (
     <div className="flex flex-col items-center gap-4 w-full text-center">
@@ -24,7 +27,7 @@ const GameStatus: React.FC<GameStatusProps> = ({ gameState, onRestart, onContinu
       {showButtons && (
         <ButtonGroup onContinue={onContinue} onRestart={onRestart} />
       )}
-      <ConfettiAnimation winner={gameState.winner && gameState.winner !== 'draw' ? gameState.winner : null} />
+      <ConfettiAnimation winner={confettiWinner} />
     </div>
   );
 };

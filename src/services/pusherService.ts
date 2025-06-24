@@ -21,10 +21,33 @@ class PusherService {
     this.channel.bind(GAME_EVENTS.GAME_MOVE, (data: RoomUpdate) => {
       this.messageHandlers.forEach(handler => handler(data));
     });
+
+    this.channel.bind(GAME_EVENTS.AD_SHOW_INTERSTITIAL, (data: RoomUpdate) => {
+      this.messageHandlers.forEach(handler => handler(data));
+    });
+
+    this.channel.bind(GAME_EVENTS.AD_CLOSE_INTERSTITIAL, (data: RoomUpdate) => {
+      this.messageHandlers.forEach(handler => handler(data));
+    });
   }
 
   sendUpdate(update: RoomUpdate) {
-    const eventName = update.type === 'GAME_MOVE' ? GAME_EVENTS.GAME_MOVE : GAME_EVENTS.ROOM_UPDATE;
+    let eventName = GAME_EVENTS.ROOM_UPDATE;
+    
+    switch (update.type) {
+      case 'GAME_MOVE':
+        eventName = GAME_EVENTS.GAME_MOVE;
+        break;
+      case 'AD_SHOW_INTERSTITIAL':
+        eventName = GAME_EVENTS.AD_SHOW_INTERSTITIAL;
+        break;
+      case 'AD_CLOSE_INTERSTITIAL':
+        eventName = GAME_EVENTS.AD_CLOSE_INTERSTITIAL;
+        break;
+      default:
+        eventName = GAME_EVENTS.ROOM_UPDATE;
+    }
+
     fetch('/api/pusher/trigger', {
       method: 'POST',
       headers: {

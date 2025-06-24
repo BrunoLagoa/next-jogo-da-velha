@@ -7,7 +7,7 @@ export interface RoomProps {
 }
 
 export interface RoomUpdate {
-  type: 'CREATE' | 'JOIN' | 'LEAVE' | 'UPDATE_STATUS' | 'GAME_MOVE';
+  type: 'CREATE' | 'JOIN' | 'LEAVE' | 'UPDATE_STATUS' | 'GAME_MOVE' | 'AD_SHOW_INTERSTITIAL' | 'AD_CLOSE_INTERSTITIAL';
   room?: {
     id: string;
     name: string;
@@ -25,4 +25,5 @@ export interface RoomUpdate {
     winner: string | null;
     history: { player: string; position: number; winner: string | null }[];
   };
+  timestamp?: number;
 }

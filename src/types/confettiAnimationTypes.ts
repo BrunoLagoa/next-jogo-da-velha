@@ -1,3 +1,3 @@
 export interface ConfettiAnimationProps {
-  winner: string | null;
+  winner: string | null | boolean;
 }
