@@ -4,7 +4,6 @@ export interface AdConfig {
     banner: string;
     sidebar: string;
     interstitial: string;
-    gameResult: string;
   };
 }
 
@@ -51,11 +50,10 @@ export const AD_PLACEMENTS: AdPlacement[] = [
 
 // Configuração para desenvolvimento/teste
 export const AD_CONFIG: AdConfig = {
-  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "ca-pub-XXXXXXXXXXXXXXXX",
+  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "ca-pub-4742409395558588",
   slots: {
     banner: process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || "1234567890",
     sidebar: process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT || "2345678901",
-    interstitial: process.env.NEXT_PUBLIC_ADSENSE_INTERSTITIAL_SLOT || "3456789012",
-    gameResult: process.env.NEXT_PUBLIC_ADSENSE_RESULT_SLOT || "4567890123"
+    interstitial: process.env.NEXT_PUBLIC_ADSENSE_INTERSTITIAL_SLOT || "3456789012"
   }
 }; 
