@@ -51,7 +51,7 @@ export const AD_PLACEMENTS: AdPlacement[] = [
 
 // Configuração para desenvolvimento/teste
 export const AD_CONFIG: AdConfig = {
-  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "ca-pub-XXXXXXXXXXXXXXXX",
+  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "ca-pub-4742409395558588",
   slots: {
     banner: process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || "1234567890",
     sidebar: process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT || "2345678901",
