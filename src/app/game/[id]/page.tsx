@@ -8,7 +8,7 @@ export default function GamePage() {
   const roomId = params?.id as string;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="min-h-screen">
       <GameController initialRoomId={roomId} />
     </div>
   );
