@@ -22,7 +22,7 @@ export const AD_PLACEMENTS: AdPlacement[] = [
     name: 'Banner do Lobby',
     location: 'lobby',
     type: 'banner',
-    enabled: true
+    enabled: false
   },
   {
     id: 'game-sidebar',
