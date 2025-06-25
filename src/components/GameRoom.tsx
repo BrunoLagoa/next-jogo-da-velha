@@ -9,6 +9,7 @@ import GameHistory from '@/components/GameHistory';
 import Scoreboard from '@/components/Scoreboard';
 import AdBanner from '@/components/AdBanner';
 import AdInterstitial from '@/components/AdInterstitial';
+import SectionTitle from '@/components/SectionTitle';
 import { GameRoomProps } from '@/types/gameRoomTypes';
 import { AD_CONFIG } from '@/types/adTypes';
 
@@ -85,7 +86,7 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
   if (!room.playerX || !room.playerO) {
     return (
       <div className="text-center p-8">
-        <h2 className="text-2xl font-bold mb-4">Sala: {room.name}</h2>
+        <SectionTitle>Sala: {room.name}</SectionTitle>
         <p className="text-gray-400 mb-4">
           Aguardando outro jogador...
           <br />
@@ -120,7 +121,7 @@ export default function GameRoom({ room, playerName, onLeaveRoom }: GameRoomProp
     <>
       <div className="flex flex-col gap-8 items-center p-4">
         <div className="flex gap-4 justify-between items-center w-full max-w-4xl">
-          <h2 className="text-2xl font-bold">Sala: {room.name}</h2>
+          <SectionTitle className="mb-0">Sala: {room.name}</SectionTitle>
           <button
             onClick={handleLeave}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"

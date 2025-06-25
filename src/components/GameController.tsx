@@ -1,17 +1,41 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useRoomController } from '@/hooks/useRoomController';
 import { authService } from '@/services/authService';
 import Lobby from '@/components/Lobby';
 import GameRoom from '@/components/GameRoom';
+import PageLayout from '@/components/PageLayout';
+import GameTitle from '@/components/GameTitle';
 import { GameControllerProps } from '@/types/gameControllerTypes';
+
+// Componente para input do nome que só renderiza no cliente
+const PlayerNameForm = dynamic(() => import('@/components/PlayerNameForm'), { 
+  ssr: false,
+  loading: () => (
+    <div className="w-full max-w-md">
+      <div className="flex gap-2">
+        <div className="flex-1 h-10 bg-gray-700 rounded animate-pulse"></div>
+        <div className="w-20 h-10 bg-blue-500 rounded animate-pulse"></div>
+      </div>
+      <div className="text-xs text-gray-400 px-1 mt-1">Carregando...</div>
+    </div>
+  )
+});
 
 export default function GameController({ initialRoomId }: GameControllerProps) {
   const [playerName, setPlayerName] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [isNameSubmitted, setIsNameSubmitted] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const { rooms, createRoom, joinRoom, leaveRoom } = useRoomController();
   const maxLength = 20;
+
+  // Garantir que o componente só renderize após a hidratação
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleCreateRoom = async (name: string) => {
     if (!playerName || !name.trim()) return;
@@ -51,8 +75,6 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
     setSelectedRoomId(null);
   };
 
-  const [isNameSubmitted, setIsNameSubmitted] = useState(false);
-
   const handleNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!playerName.trim()) return;
@@ -84,61 +106,55 @@ export default function GameController({ initialRoomId }: GameControllerProps) {
     }
   }, [isNameSubmitted, initialRoomId, rooms, handleJoinRoom]);
 
+  // Mostrar loading enquanto não hidratou
+  if (!isHydrated) {
+    return (
+      <PageLayout>
+        <GameTitle />
+        <div className="text-lg text-gray-300 text-center">
+          Carregando...
+        </div>
+      </PageLayout>
+    );
+  }
+
   if (!isNameSubmitted) {
     return (
-      <div className="grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen p-4 pb-16 gap-8 sm:p-8 sm:gap-16 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-[32px] row-start-2 items-center">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Jogo da Velha</h1>
-          <p className="text-lg text-gray-300 text-center animate-pulse hover:animate-none transition-all duration-300 cursor-default">
-            Prepare-se para a batalha mais divertida do universo! 🎮✨<br />
-            Onde X e O dançam numa guerra pacífica pelo território!
-          </p>
-          <form onSubmit={handleNameSubmit} className="w-full max-w-md">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                maxLength={maxLength}
-                placeholder="Digite seu nome"
-                className="flex-1 px-4 py-2 rounded bg-gray-700 text-white"
-              />
-              <button
-                type="submit"
-                disabled={!playerName.trim()}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Confirmar
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 px-1 mt-1">{playerName.length}/{maxLength} caracteres</p>
-          </form>
-        </main>
-      </div>
+      <PageLayout>
+        <GameTitle />
+        <p className="text-lg text-gray-300 text-center animate-pulse hover:animate-none transition-all duration-300 cursor-default">
+          Prepare-se para a batalha mais divertida do universo! 🎮✨<br />
+          Onde X e O dançam numa guerra pacífica pelo território!
+        </p>
+        <PlayerNameForm
+          playerName={playerName}
+          setPlayerName={setPlayerName}
+          handleNameSubmit={handleNameSubmit}
+          maxLength={maxLength}
+        />
+      </PageLayout>
     );
   }
 
   const selectedRoom = selectedRoomId ? rooms.find(room => room.id === selectedRoomId) : null;
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen p-4 pb-16 gap-8 sm:p-8 sm:gap-16 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center w-full">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Jogo da Velha</h1>
-        {selectedRoom ? (
-          <GameRoom
-            room={selectedRoom}
-            playerName={playerName}
-            onLeaveRoom={handleLeaveRoom}
-          />
-        ) : (
-          <Lobby
-            rooms={rooms}
-            playerName={playerName}
-            onCreateRoom={handleCreateRoom}
-            onJoinRoom={handleJoinRoom}
-          />
-        )}
-      </main>
-    </div>
+    <PageLayout>
+      <GameTitle />
+      {selectedRoom ? (
+        <GameRoom
+          room={selectedRoom}
+          playerName={playerName}
+          onLeaveRoom={handleLeaveRoom}
+        />
+      ) : (
+        <Lobby
+          rooms={rooms}
+          playerName={playerName}
+          onCreateRoom={handleCreateRoom}
+          onJoinRoom={handleJoinRoom}
+        />
+      )}
+    </PageLayout>
   );
 }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import AdBanner from '@/components/AdBanner';
 import { useAds } from '@/hooks/useAds';
 import { AD_CONFIG } from '@/types/adTypes';
+import SectionTitle from '@/components/SectionTitle';
 
 export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: LobbyProps) {
   const [newRoomName, setNewRoomName] = useState('');
@@ -32,7 +33,7 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
       )}
 
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Criar Nova Sala</h2>
+        <SectionTitle>Criar Nova Sala</SectionTitle>
         <div className="flex gap-2">
           <input
             type="text"
@@ -54,7 +55,7 @@ export default function Lobby({ rooms, playerName, onCreateRoom, onJoinRoom }: L
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-4">Salas Disponíveis</h2>
+        <SectionTitle>Salas Disponíveis</SectionTitle>
         <div className="grid gap-4">
           {rooms.map((room) => (
             <div
